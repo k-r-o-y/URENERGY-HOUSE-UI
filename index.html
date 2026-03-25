@@ -3,239 +3,783 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>U(R)Energy</title>
+    <title>U(R)Energy v3</title>
     <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.182.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="./glb-data.js?v=2"></script>
+    <script>console.info("INDEX_HTML_VERSION_V3", window.location.href);</script>
   </head>
   <body>
     <div class="app-shell">
-      <header class="topbar">
-        <div class="brand">U(R)Energy</div>
-        <div class="headline">YOUR ENERGY . OUR FUTURE .</div>
-        <div class="controls">
-          <button id="startCameraBtn" class="start-btn">Start Camera</button>
-          <button id="connectCrankBtn" class="start-btn">Connect Crank</button>
-        </div>
-      </header>
+
+      <!-- Corner icon buttons -->
+      <div class="corner-icons">
+        <button id="startCameraBtn" class="icon-btn" aria-label="Start Camera" style="display:none"></button>
+        <button id="connectCrankBtn" class="icon-btn" aria-label="Connect Crank" title="Connect Crank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M8 2v4M16 2v4"/>
+            <rect x="7" y="6" width="10" height="7" rx="2"/>
+            <path d="M12 13v9"/>
+          </svg>
+        </button>
+        <button id="fullscreenBtn" class="icon-btn" aria-label="Enter Fullscreen" title="Enter Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+        </button>
+      </div>
 
       <main class="dashboard">
-        <section class="left-panel panel">
-          <div class="session-block">
-            <div id="rotationCount" class="big-number">0</div>
-            <div class="micro-label">ROTATIONS . THIS SESSION</div>
-          </div>
 
-          <div class="stat-grid">
-            <div class="stat-cell">
-              <div id="wattValue" class="stat-number">0.00</div>
-              <div class="stat-label">Watt</div>
+        <!-- LEFT: This Session -->
+        <section class="left-panel">
+          <div class="session-glass">
+            <div class="session-header">This Session</div>
+            <div class="session-stats">
+              <div class="stat-item">
+                <div id="rotationCount" class="stat-value">0</div>
+                <div class="stat-label">Rotations</div>
+                <div class="stat-last">Last: <span id="lastRotations">—</span></div>
+              </div>
+              <div class="stat-item">
+                <div id="wattValue" class="stat-value">0.00</div>
+                <div class="stat-label">Watts Produced</div>
+                <div class="stat-last">Last: <span id="lastWatts">—</span></div>
+              </div>
+              <div class="stat-item">
+                <div id="kcalValue" class="stat-value">0</div>
+                <div class="stat-label">Calories Burned</div>
+                <div class="stat-last">Last: <span id="lastKcal">—</span></div>
+              </div>
+              <div class="stat-item">
+                <div id="promptValue" class="stat-value">0</div>
+                <div class="stat-label">AI Prompts Powered</div>
+                <div class="stat-last">Last: <span id="lastPrompts">—</span></div>
+              </div>
             </div>
-            <div class="stat-cell">
-              <div id="kcalValue" class="stat-number">0</div>
-              <div class="stat-label">kcal burned</div>
-            </div>
-            <div class="stat-cell">
-              <div id="timeValue" class="stat-number">0:00</div>
-              <div class="stat-label">Time spent</div>
-            </div>
-            <div class="stat-cell">
-              <div id="promptValue" class="stat-number">0</div>
-              <div class="stat-label">AI prompts</div>
-            </div>
-          </div>
-
-          <div class="mode-row">
-            <span class="mode-label">Input mode</span>
-            <span id="modeValue" class="mode-value">IDLE</span>
-          </div>
-
-          <div class="split-block">
-            <div class="split-row">
-              <span>Your energy</span>
-              <span id="userShareValue">20%</span>
-            </div>
-            <div class="bar"><div id="userShareBar" class="fill cyan"></div></div>
-
-            <div class="split-row">
-              <span>UREnergy fee</span>
-              <span>80%</span>
-            </div>
-            <div class="bar"><div class="fill pink fixed-80"></div></div>
           </div>
         </section>
 
-        <section class="center-panel panel">
-          <div class="center-title">ENERGY DISTRIBUTED TO YOUR HOUSE . LIVE</div>
+        <!-- CENTER: Gauge + House -->
+        <section class="center-panel">
+          <div class="house-gauge-wrapper">
 
-          <div class="house-stage">
-            <svg class="house-svg" viewBox="0 0 820 560">
-              <g transform="translate(-36, 18) scale(0.94)">
-                <!-- chimney smoke -->
-                <g id="chimneySmoke" class="smoke-group">
-                  <circle class="smoke puff-1" cx="556" cy="36" r="11"></circle>
-                  <circle class="smoke puff-2" cx="566" cy="18" r="15"></circle>
-                  <circle class="smoke puff-3" cx="578" cy="-4" r="18"></circle>
-                </g>
-          
-                <!-- roof -->
-                <polygon
-                points="200,126 620,126 592,82 228,82"
-                class="roof-top"
-              />
-<rect x="530" y="40" width="34" height="58" class="chimney" />
-<rect x="525" y="30" width="44" height="14" class="chimney-cap" />
-
-<!-- roof tile lines -->
-<line x1="244" y1="96" x2="576" y2="96" class="roof-tile-line" />
-<line x1="236" y1="108" x2="590" y2="108" class="roof-tile-line" />
-<line x1="224" y1="120" x2="602" y2="120" class="roof-tile-line" />
-<line x1="270" y1="88" x2="252" y2="126" class="roof-tile-seam" />
-<line x1="320" y1="88" x2="304" y2="126" class="roof-tile-seam" />
-<line x1="370" y1="88" x2="356" y2="126" class="roof-tile-seam" />
-<line x1="420" y1="88" x2="408" y2="126" class="roof-tile-seam" />
-<line x1="470" y1="88" x2="460" y2="126" class="roof-tile-seam" />
-<line x1="520" y1="88" x2="512" y2="126" class="roof-tile-seam" />
-          
-                <!-- outer structure -->
-                <rect x="205" y="120" width="410" height="330" class="house-shell" />
-                <rect x="205" y="270" width="410" height="18" class="floor-divider" />
-                <rect x="205" y="120" width="18" height="330" class="frame" />
-                <rect x="597" y="120" width="18" height="330" class="frame" />
-                <rect x="205" y="432" width="410" height="18" class="frame" />
-
-                <!-- outer wall faces -->
-<rect x="223" y="126" width="374" height="12" class="outer-wall" />
-<rect x="223" y="138" width="12" height="294" class="outer-wall" />
-<rect x="585" y="138" width="12" height="294" class="outer-wall" />
-<rect x="223" y="420" width="374" height="12" class="outer-wall" />
-          
-                <!-- upper rooms -->
-                <rect x="223" y="138" width="180" height="132" class="room room-bedroom" />
-                <rect x="421" y="138" width="176" height="132" class="room room-bath" />
-          
-                <!-- lower rooms -->
-                <rect x="223" y="288" width="260" height="144" class="room room-kitchen" />
-                <rect x="501" y="288" width="96" height="144" class="room room-utility" />
-          
-                <!-- upper left bedroom -->
-                <rect x="254" y="226" width="88" height="18" class="bed-base" />
-                <rect x="246" y="212" width="28" height="20" class="pillow" />
-                <rect x="336" y="202" width="30" height="42" id="utility-radiator" class="utility-shape off heat-shape" />
-                <circle cx="319" cy="160" r="7" id="utility-light-bedroom" class="utility-shape off light-shape" />
-                <path d="M319 160 L319 194" class="fixture-line" />
-                <polygon points="292,194 346,194 330,208 308,208" class="lamp-shade" />
-          
-                <!-- upper middle boiler -->
-                <rect x="386" y="164" width="34" height="62" id="utility-boiler" class="utility-shape off power-shape" rx="5" />
-                <circle cx="403" cy="192" r="8" class="boiler-dial" />
-                <line x1="396" y1="226" x2="396" y2="270" class="pipe" />
-                <line x1="410" y1="226" x2="410" y2="270" class="pipe" />
-          
-                <!-- upper right bathroom -->
-                <rect x="472" y="198" width="56" height="20" class="bathtub" rx="6" />
-                <rect x="541" y="218" width="26" height="22" class="toilet" rx="4" />
-                <rect x="500" y="182" width="42" height="10" class="sink" rx="4" />
-                <circle cx="506" cy="160" r="7" id="utility-light-bathroom" class="utility-shape off light-shape" />
-                <path d="M506 160 L506 192" class="fixture-line" />
-                <polygon points="478,192 534,192 520,205 492,205" class="lamp-shade" />
-          
-                <!-- lower kitchen -->
-                <rect x="250" y="374" width="48" height="40" class="cabinet" />
-                <rect x="303" y="374" width="58" height="40" class="cabinet" />
-                <rect x="366" y="374" width="52" height="40" class="cabinet" />
-                <rect x="285" y="340" width="106" height="16" class="countertop" />
-                <rect x="318" y="350" width="28" height="18" class="sink-basin" />
-                <rect x="404" y="360" width="34" height="54" class="appliance" />
-                <circle cx="421" cy="387" r="10" class="washer-door" />
-                <circle cx="338" cy="322" r="7" id="utility-light-kitchen" class="utility-shape off light-shape" />
-                <path d="M338 322 L338 352" class="fixture-line" />
-                <polygon points="310,352 366,352 350,364 326,364" class="lamp-shade" />
-          
-                <!-- water / utility room -->
-                <rect x="545" y="338" width="34" height="66" id="utility-water-tank" class="utility-shape off water-shape" rx="6" />
-                <rect x="520" y="392" width="28" height="22" id="utility-pump" class="utility-shape off power-shape" rx="4" />
-                <line x1="560" y1="404" x2="560" y2="432" class="pipe" />
-                <line x1="548" y1="404" x2="548" y2="432" class="pipe" />
-                <rect x="512" y="324" width="72" height="8" class="utility-shelf" />
-          
-                <!-- front door -->
-                <rect x="228" y="324" width="62" height="96" class="front-door-arch" rx="28" />
-                <rect x="238" y="336" width="42" height="74" class="front-door" rx="18" />
-                <rect x="250" y="352" width="12" height="38" class="door-window" />
-                <rect x="266" y="352" width="12" height="38" class="door-window" />
-          
-                <!-- endpoint -->
-                <g transform="translate(640,195)">
-                  <rect x="0" y="0" width="112" height="72" class="endpoint-box" rx="10" />
-                  <text x="56" y="24" text-anchor="middle" class="endpoint-title">ENDPOINT</text>
-                  <text x="56" y="48" text-anchor="middle" id="endpointLabel" class="endpoint-text">Awaiting</text>
-                </g>
-          
-                <!-- energy dots -->
-                <g id="energyDots"></g>
-              </g>
+            <!-- Gauge SVG ring (sits behind house) -->
+            <svg class="gauge-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" id="gaugeSvg">
+              <defs>
+                <filter id="gaugeGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur1"/>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur2"/>
+                  <feMerge>
+                    <feMergeNode in="blur1"/>
+                    <feMergeNode in="blur2"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="gaugeOuterGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- Track arc -->
+              <circle class="gauge-track" cx="50" cy="50" r="45"/>
+              <!-- Outer glow arc -->
+              <circle class="gauge-outer-glow" id="gaugeOuterGlow" cx="50" cy="50" r="45"/>
+              <!-- Core fill arc -->
+              <circle class="gauge-fill" id="gaugeFill" cx="50" cy="50" r="45"/>
+              <!-- End cap dot -->
+              <circle class="gauge-cap-dot" id="gaugeCapDot" cx="50" cy="5" r="1.8"/>
             </svg>
+
+            <!-- 3-D model viewer (Three.js populates this when WebGL available) -->
+            <div id="glbContainer" class="glb-container"></div>
+
+            <!-- CSS fallback building (visible until Three.js replaces it) -->
+            <div id="cyberFallback" class="cyber-building-wrap">
+              <div class="cyber-bldg">
+                <div class="bldg-antenna">
+                  <div class="antenna-tip"></div>
+                  <div class="antenna-pole"></div>
+                </div>
+                <div class="bldg-penthouse">
+                  <div class="pent-window"></div>
+                  <div class="pent-window"></div>
+                  <div class="pent-window"></div>
+                </div>
+                <div class="bldg-body">
+                  <div class="neon-v neon-l"></div>
+                  <div class="neon-v neon-r"></div>
+                  <div class="floor-row" style="--fi:0"><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span></div>
+                  <div class="floor-row" style="--fi:1"><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win w-off"></span></div>
+                  <div class="floor-row" style="--fi:2"><span class="win w-off"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win"></span></div>
+                  <div class="floor-sep"></div>
+                  <div class="floor-row" style="--fi:3"><span class="win"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win w-off"></span></div>
+                  <div class="floor-row" style="--fi:4"><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span></div>
+                  <div class="floor-row" style="--fi:5"><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win"></span></div>
+                  <div class="floor-sep"></div>
+                  <div class="floor-row" style="--fi:6"><span class="win"></span><span class="win w-off"></span><span class="win w-off"></span><span class="win"></span><span class="win"></span></div>
+                  <div class="floor-row" style="--fi:7"><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span></div>
+                  <div class="floor-row" style="--fi:8"><span class="win"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win"></span></div>
+                  <div class="floor-sep"></div>
+                  <div class="floor-row" style="--fi:9"><span class="win"></span><span class="win w-off"></span><span class="win"></span><span class="win w-off"></span><span class="win"></span></div>
+                  <div class="floor-row" style="--fi:10"><span class="win w-off"></span><span class="win"></span><span class="win"></span><span class="win"></span><span class="win w-off"></span></div>
+                  <div class="bldg-base"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status chips (absolute, scattered around model) -->
+            <div class="status-chip chip-bl" id="chip-datacenter">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Feeding Data Centers</span>
+            </div>
+            <div class="status-chip chip-tl" id="chip-ai">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Powering Local AI</span>
+            </div>
+            <div class="status-chip chip-tr" id="chip-water">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Obtaining Water</span>
+            </div>
+            <div class="status-chip chip-r" id="chip-heat">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Producing Heat</span>
+            </div>
+            <div class="status-chip chip-br" id="chip-lights">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Generating Light</span>
+            </div>
+
+            <!-- Achievement banner (shows when sesRot >= spinsToComplete) -->
+            <div id="achievementBanner" class="achievement-banner hidden">
+              <span id="achievementText">DO NOT STOP WORKING</span>
+            </div>
+
+            <!-- Inactivity alert (countdown) -->
+            <div id="inactivityAlert" class="inactivity-alert hidden">
+              <span class="alert-icon">&#9888;</span>
+              <span class="alert-text">INACTIVITY DETECTED. RESETTING IN <span id="alertCountdown">8</span></span>
+              <span class="alert-icon">&#9888;</span>
+            </div>
           </div>
 
-          <div class="cap-row">
-            <div>
-              <div class="cap-title">Energy Cap</div>
-              <div class="cap-sub">Crank to fill</div>
-            </div>
-            <div class="cap-right">
-              <div id="capPercent">0%</div>
-              <div class="bar wide"><div id="capFill" class="fill cyan"></div></div>
-            </div>
-          </div>
-
-          <div class="energized-panel">
-            <div class="energized-title">ENERGIZED UTILITIES</div>
-            <div class="energized-list">
-              <div id="statusLights" class="utility-pill off">Lights</div>
-              <div id="statusWater" class="utility-pill off">Water</div>
-              <div id="statusHeat" class="utility-pill off">Heating</div>
-              <div id="statusPower" class="utility-pill off">Power / Boiler</div>
-              <div id="statusSmoke" class="utility-pill off">Chimney Exhaust</div>
-            </div>
-          </div>
         </section>
 
-        <section class="right-panel panel">
-          <div class="global-title">Global Contribution</div>
+        <!-- RIGHT: Global Contribution -->
+        <section class="right-panel">
+          <div class="global-title">Global<br>Contribution</div>
 
           <div class="global-block">
-            <div class="global-kicker">TOTAL ENERGY HARVESTED</div>
+            <div class="global-kicker">Total Energy Harvested</div>
             <div id="globalEnergy" class="global-number">0</div>
-            <div class="global-sub">Watt . All Contributors</div>
+            <div class="global-sub">Watt &middot; All Contributors</div>
           </div>
 
           <div class="global-block">
-            <div class="global-kicker">TOTAL CONTRIBUTORS</div>
+            <div class="global-kicker">Total Contributors</div>
             <div class="global-number">2,000</div>
             <div class="global-sub">Human count</div>
           </div>
 
           <div class="global-block">
-            <div class="global-kicker">ACTIVE DATA CENTERS</div>
+            <div class="global-kicker">Active Data Centers</div>
             <div class="global-number">10</div>
             <div class="global-sub">Supplied by UREnergy</div>
           </div>
 
           <div class="global-block">
-            <div class="global-kicker">TOTAL AI PROMPTS GENERATED</div>
+            <div class="global-kicker">Total AI Prompts</div>
             <div id="globalPrompts" class="global-number">0</div>
             <div class="global-sub">Number of Prompts</div>
           </div>
         </section>
       </main>
 
-      <footer class="footer-note">
-        THANK YOU FOR YOUR CONTRIBUTION TO AI GENERATION
-      </footer>
-
       <video id="cameraFeed" class="hidden-capture" autoplay playsinline muted></video>
       <canvas id="motionCanvas" class="hidden-capture"></canvas>
+      <script>
+// ─── State ─────────────────────────────────────────────────────────────────
+const state = {
+  cameraReady: false, motionScore: 0, energyScore: 0, rotations: 0,
+  kcal: 0, seconds: 0, prompts: 0, totalEnergy: 0, chargeLevel: 0,
+  utilitiesPowered: false, inputMode: "idle",
+};
+const listeners = new Set();
+function getState() { return state; }
+function subscribe(fn) { listeners.add(fn); }
+function setState(patch) { Object.assign(state, patch); listeners.forEach(fn => fn(state)); }
+function resetState(patch = {}) {
+  Object.assign(state, { cameraReady:false, motionScore:0, energyScore:0, rotations:0,
+    kcal:0, seconds:0, prompts:0, totalEnergy:0, chargeLevel:0, utilitiesPowered:false, inputMode:"idle", ...patch });
+  listeners.forEach(fn => fn(state));
+}
 
-      <script type="module" src="./app.js"></script>
+// ─── Clamp helper ──────────────────────────────────────────────────────────
+function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
+
+// ─── MotionTracker ─────────────────────────────────────────────────────────
+class MotionTracker {
+  constructor({ video, canvas, onUpdate }) {
+    this.video = video; this.canvas = canvas;
+    this.ctx = canvas.getContext("2d", { willReadFrequently: true });
+    this.onUpdate = onUpdate; this.stream = null; this.running = false;
+    this.prevFrame = null; this.lastTime = 0; this.lastRotationTick = 0;
+    this.startTime = 0; this.kcal = 0; this.rotations = 0; this.prompts = 0;
+    this.totalEnergy = 0; this.chargeLevel = 0; this.rafId = null;
+    this.freezeStartedAt = null; this.freezeDuration = 1800; this.frozen = false;
+    this.displayMotion = 0; this.displayEnergy = 0; this.finalSeconds = 0;
+  }
+  async start() {
+    this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    this.video.srcObject = this.stream;
+    await this.video.play();
+    this.canvas.width = 160; this.canvas.height = 120; this.running = true;
+    this.prevFrame = null; this.lastTime = performance.now(); this.lastRotationTick = 0;
+    this.startTime = performance.now(); this.kcal = 0; this.rotations = 0;
+    this.prompts = 0; this.totalEnergy = 0; this.chargeLevel = 0;
+    this.freezeStartedAt = null; this.frozen = false; this.displayMotion = 0;
+    this.displayEnergy = 0; this.finalSeconds = 0;
+    this.rafId = requestAnimationFrame(this.loop.bind(this));
+  }
+  stop() {
+    this.running = false;
+    if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
+    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
+    this.video.srcObject = null; this.prevFrame = null;
+  }
+  loop(now) {
+    if (!this.running) return;
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
+    this.lastTime = now;
+    if (!this.freezeStartedAt) {
+      this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+      const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+      let diff = 0;
+      if (this.prevFrame) { for (let i = 0; i < frame.length; i += 16) diff += Math.abs(frame[i] - this.prevFrame[i]); }
+      this.prevFrame = new Uint8ClampedArray(frame);
+      const rawMotion = clamp(diff / 40000), rawEnergy = clamp(rawMotion * 1.15);
+      this.displayMotion += (rawMotion - this.displayMotion) * 0.22;
+      this.displayEnergy += (rawEnergy - this.displayEnergy) * 0.22;
+      if (this.displayMotion > 0.12 && now - this.lastRotationTick > 450) { this.rotations += 1; this.lastRotationTick = now; }
+      this.kcal += this.displayMotion * 0.24;
+      this.totalEnergy += this.displayEnergy * 3.8;
+      this.prompts = Math.floor(this.totalEnergy / 6.5);
+      const fillRate = this.displayMotion * 0.18 + Math.pow(this.displayMotion, 1.35) * 0.55;
+      this.chargeLevel = clamp(this.chargeLevel + fillRate * dt);
+      if (this.chargeLevel > 0.9 && this.chargeLevel < 1) this.chargeLevel = clamp(this.chargeLevel + 0.008);
+      if (this.chargeLevel >= 0.995) { this.chargeLevel = 1; this.freezeStartedAt = now; this.finalSeconds = Math.floor((now - this.startTime) / 1000); }
+    } else if (!this.frozen) {
+      const t = clamp((now - this.freezeStartedAt) / this.freezeDuration);
+      const easeOut = 1 - Math.pow(1 - t, 3);
+      this.displayMotion *= 1 - 0.16 * easeOut; this.displayEnergy *= 1 - 0.18 * easeOut;
+      if (t >= 1 || (this.displayMotion < 0.002 && this.displayEnergy < 0.002)) { this.displayMotion = 0; this.displayEnergy = 0; this.frozen = true; }
+    }
+    const seconds = this.freezeStartedAt ? this.finalSeconds : Math.floor((now - this.startTime) / 1000);
+    const utilitiesPowered = this.chargeLevel >= 1;
+    this.onUpdate({ cameraReady:true, motionScore:this.displayMotion, energyScore:utilitiesPowered?1:this.displayEnergy,
+      rotations:this.rotations, kcal:this.kcal, seconds, prompts:this.prompts,
+      totalEnergy:this.totalEnergy, chargeLevel:this.chargeLevel, utilitiesPowered, inputMode:"camera" });
+    this.rafId = requestAnimationFrame(this.loop.bind(this));
+  }
+}
+
+// ─── CrankTracker ──────────────────────────────────────────────────────────
+class CrankTracker {
+  constructor({ onUpdate }) {
+    this.onUpdate = onUpdate; this.port = null; this.reader = null; this.decoder = null;
+    this.running = false; this.startTime = 0; this.lastTime = 0; this.buffer = "";
+    this.totalRotations = 0; this.prevRotations = 0; this.kcal = 0; this.prompts = 0;
+    this.totalEnergy = 0; this.chargeLevel = 0; this.freezeStartedAt = null;
+    this.freezeDuration = 2200; this.frozen = false; this.displayMotion = 0;
+    this.displayEnergy = 0; this.rotationBurst = 0; this.finalSeconds = 0;
+  }
+  async connect() {
+    if (!("serial" in navigator)) throw new Error("Web Serial is not supported in this browser.");
+    this.port = await navigator.serial.requestPort();
+    await this.port.open({ baudRate: 9600 });
+    this.decoder = new TextDecoder(); this.reader = this.port.readable.getReader();
+    this.running = true; this.startTime = performance.now(); this.lastTime = performance.now();
+    this.buffer = ""; this.totalRotations = 0; this.prevRotations = 0; this.kcal = 0;
+    this.prompts = 0; this.totalEnergy = 0; this.chargeLevel = 0; this.freezeStartedAt = null;
+    this.frozen = false; this.displayMotion = 0; this.displayEnergy = 0; this.rotationBurst = 0; this.finalSeconds = 0;
+    this.readLoop(); requestAnimationFrame(this.loop.bind(this));
+  }
+  async disconnect() {
+    this.running = false;
+    try { if (this.reader) { await this.reader.cancel(); this.reader.releaseLock(); } } catch {}
+    this.reader = null;
+    try { if (this.port) await this.port.close(); } catch {}
+    this.port = null;
+  }
+  handleLine(line) {
+    const t = line.trim(); if (!t) return;
+    if (t.startsWith("SPINS:")) {
+      const raw = parseInt(t.slice(6), 10); if (Number.isNaN(raw)) return;
+      this.rotationBurst += raw >= this.prevRotations ? raw - this.prevRotations : raw;
+      this.totalRotations = raw; this.prevRotations = raw; return;
+    }
+    if (t.startsWith("SESSION_END:")) { this.totalRotations = 0; this.prevRotations = 0; this.rotationBurst = 0; return; }
+    if (/^\d+$/.test(t)) {
+      const raw = parseInt(t, 10);
+      this.rotationBurst += raw >= this.prevRotations ? raw - this.prevRotations : raw;
+      this.totalRotations = raw; this.prevRotations = raw;
+    }
+  }
+  async readLoop() {
+    while (this.running && this.reader) {
+      try {
+        const { value, done } = await this.reader.read();
+        if (done) break; if (!value) continue;
+        this.buffer += this.decoder.decode(value, { stream: true });
+        const lines = this.buffer.split("\n"); this.buffer = lines.pop() ?? "";
+        for (const line of lines) this.handleLine(line);
+      } catch { break; }
+    }
+  }
+  loop(now) {
+    if (!this.running) return;
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1); this.lastTime = now;
+    if (!this.freezeStartedAt) {
+      const rotationsThisFrame = this.rotationBurst; this.rotationBurst = 0;
+      const rps = rotationsThisFrame / Math.max(dt, 0.001);
+      this.displayMotion += (clamp(rps / 5) - this.displayMotion) * 0.25;
+      this.displayEnergy += (clamp(rps / 4.5) - this.displayEnergy) * 0.25;
+      this.kcal = this.totalRotations * 0.122;
+      this.totalEnergy = this.totalRotations * 0.704;
+      this.prompts = Math.floor(this.totalRotations / 3.55);
+      // Fill gauge: spinsToComplete rotations = full charge (1.0)
+      this.chargeLevel = clamp(this.chargeLevel + rotationsThisFrame / spinsToComplete);
+      if (this.chargeLevel > 0.9 && this.chargeLevel < 1) this.chargeLevel = clamp(this.chargeLevel + 0.01);
+      if (this.chargeLevel >= 0.995) { this.chargeLevel = 1; this.freezeStartedAt = now; this.finalSeconds = Math.floor((now - this.startTime) / 1000); }
+    } else if (!this.frozen) {
+      const t = clamp((now - this.freezeStartedAt) / this.freezeDuration);
+      const easeOut = 1 - Math.pow(1 - t, 3);
+      this.displayMotion *= 1 - 0.16 * easeOut; this.displayEnergy *= 1 - 0.18 * easeOut;
+      if (t >= 1 || (this.displayMotion < 0.002 && this.displayEnergy < 0.002)) { this.displayMotion = 0; this.displayEnergy = 0; this.frozen = true; }
+    }
+    const seconds = this.freezeStartedAt ? this.finalSeconds : Math.floor((now - this.startTime) / 1000);
+    const utilitiesPowered = this.chargeLevel >= 1;
+    this.onUpdate({ cameraReady:this.running, motionScore:this.displayMotion, energyScore:utilitiesPowered?1:this.displayEnergy,
+      rotations:this.totalRotations, kcal:this.kcal, seconds, prompts:this.prompts,
+      totalEnergy:this.totalEnergy, chargeLevel:this.chargeLevel, utilitiesPowered, inputMode:"crank" });
+    requestAnimationFrame(this.loop.bind(this));
+  }
+}
+
+// ─── App ───────────────────────────────────────────────────────────────────
+const els = {
+  cameraFeed:     document.getElementById("cameraFeed"),
+  motionCanvas:   document.getElementById("motionCanvas"),
+  startCameraBtn: document.getElementById("startCameraBtn"),
+  connectCrankBtn:document.getElementById("connectCrankBtn"),
+  fullscreenBtn:  document.getElementById("fullscreenBtn"),
+  rotationCount:  document.getElementById("rotationCount"),
+  wattValue:      document.getElementById("wattValue"),
+  kcalValue:      document.getElementById("kcalValue"),
+  promptValue:    document.getElementById("promptValue"),
+  globalPrompts:  document.getElementById("globalPrompts"),
+  globalEnergy:   document.getElementById("globalEnergy"),
+  gaugeFill:        document.getElementById("gaugeFill"),
+  gaugeOuterGlow:   document.getElementById("gaugeOuterGlow"),
+  gaugeCapDot:      document.getElementById("gaugeCapDot"),
+  inactivityAlert:  document.getElementById("inactivityAlert"),
+  alertCountdown:   document.getElementById("alertCountdown"),
+  achievementBanner:document.getElementById("achievementBanner"),
+  achievementText:  document.getElementById("achievementText"),
+  chipDatacenter:   document.getElementById("chip-datacenter"),
+  chipAI:           document.getElementById("chip-ai"),
+  chipWater:        document.getElementById("chip-water"),
+  chipHeat:         document.getElementById("chip-heat"),
+  chipLights:       document.getElementById("chip-lights"),
+  lastRotations:    document.getElementById("lastRotations"),
+  lastWatts:        document.getElementById("lastWatts"),
+  lastKcal:         document.getElementById("lastKcal"),
+  lastPrompts:      document.getElementById("lastPrompts"),
+};
+
+// ─── Session baseline (for session-relative display) ───────────────────────
+let sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
+let lastSession  = null;
+
+// ─── Three.js GLB viewer (deferred + guarded) ───────────────────────────────
+// Loads Three.js + GLTFLoader from CDN and expects a local ./glb-data.js file.
+// Falls back to the CSS cyber-building when WebGL is unavailable or the model data is missing.
+// For best results, serve the project over local HTTP: python3 -m http.server 8080
+window.addEventListener('load', function() {
+  const fallback  = document.getElementById("cyberFallback");
+  const container = document.getElementById("glbContainer");
+  const GLTFLoaderCtor =
+    (typeof THREE !== 'undefined' && typeof THREE.GLTFLoader !== 'undefined' && THREE.GLTFLoader) ||
+    (typeof window.GLTFLoader !== 'undefined' && window.GLTFLoader) ||
+    null;
+
+  console.info("3-D model bootstrap v3", {
+    threeLoaded: typeof THREE !== 'undefined',
+    threeHasGLTFLoader: typeof THREE !== 'undefined' && typeof THREE.GLTFLoader !== 'undefined',
+    windowHasGLTFLoader: typeof window.GLTFLoader !== 'undefined',
+    glbDataLoaded: typeof GLB_DATA !== 'undefined',
+    page: window.location.href,
+  });
+
+  // ── Guard: required scripts/data must all be present ───────────────────
+  if (typeof THREE === 'undefined') {
+    console.info("3-D model: Three.js failed to load from CDN. CSS building shown.");
+    return;
+  }
+  if (!GLTFLoaderCtor) {
+    console.info("3-D model: GLTFLoader failed to load. CSS building shown.");
+    return;
+  }
+  if (typeof GLB_DATA === 'undefined') {
+    console.info("3-D model: ./glb-data.js was not found or does not define GLB_DATA. CSS building shown.");
+    return;
+  }
+
+  // ── Guard: WebGL must be available ─────────────────────────────────────
+  const probe = document.createElement('canvas');
+  probe.width = 1; probe.height = 1;
+  document.body.appendChild(probe);
+  const probeCtx = probe.getContext('webgl2') || probe.getContext('webgl') || probe.getContext('experimental-webgl');
+  document.body.removeChild(probe);
+  if (!probeCtx) {
+    console.info("3-D model: WebGL unavailable — CSS building shown.\nTo enable: open chrome://settings → System → 'Use hardware acceleration when available'.");
+    return; // CSS fallback stays visible
+  }
+  const loseCtx = probeCtx.getExtension('WEBGL_lose_context');
+  if (loseCtx) loseCtx.loseContext();
+
+  // ── WebGL works — hide CSS fallback, set up Three.js ───────────────────
+  if (fallback) fallback.style.display = 'none';
+
+  try {
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 1000);
+    camera.position.set(0, 1.2, 7);
+    camera.lookAt(0, 0.5, 0);
+
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'default', failIfMajorPerformanceCaveat: false });
+    } catch(_) {
+      try { renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, failIfMajorPerformanceCaveat: false }); }
+      catch(e) { console.warn("WebGL renderer failed:", e); if (fallback) fallback.style.display = ''; return; }
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    if (renderer.outputEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const keyLight = new THREE.DirectionalLight(0xff8844, 1.1);
+    keyLight.position.set(3, 4, 5); scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0x4466ff, 0.35);
+    fillLight.position.set(-4, 0, -3); scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xff6600, 0.4);
+    rimLight.position.set(0, -2, -5); scene.add(rimLight);
+
+    function resize() {
+      const W = container.clientWidth, H = container.clientHeight;
+      if (!W || !H) return;
+      camera.aspect = W / H; camera.updateProjectionMatrix();
+      renderer.setSize(W, H, false);
+    }
+    resize();
+    try { new ResizeObserver(resize).observe(container); } catch(_) { window.addEventListener('resize', resize); }
+
+    let model = null, floatT = 0, autoRot = 0, lastTs = 0;
+    function animate(ts) {
+      requestAnimationFrame(animate);
+      const dt = Math.min((ts - lastTs) / 1000, 0.05); lastTs = ts;
+      if (model) {
+        floatT += dt; autoRot += dt * 0.25;
+        model.rotation.y = autoRot;
+        model.position.y = Math.sin(floatT * 0.7) * 0.18;
+      }
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    // Decode GLB off the critical path
+    setTimeout(function() {
+      try {
+        const bin = atob(GLB_DATA);
+        const buf = new ArrayBuffer(bin.length);
+        const arr = new Uint8Array(buf);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        new GLTFLoaderCtor().parse(buf, '', function(gltf) {
+          model = gltf.scene;
+          const box    = new THREE.Box3().setFromObject(model);
+          const size   = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
+          const s      = 3.8 / Math.max(size.x, size.y, size.z);
+          model.scale.setScalar(s);
+          model.position.sub(center.multiplyScalar(s));
+          scene.add(model);
+        }, function(err) { console.warn("GLB parse error:", err); });
+      } catch(e) { console.warn("GLB decode error:", e); }
+    }, 0);
+
+  } catch(e) {
+    console.warn("3-D model init failed:", e);
+    if (fallback) fallback.style.display = '';
+  }
+});
+
+const cameraTracker = new MotionTracker({ video: els.cameraFeed, canvas: els.motionCanvas, onUpdate: setState });
+const crankTracker  = new CrankTracker({ onUpdate: setState });
+let currentMode = "idle";
+
+async function stopAllInputs() { cameraTracker.stop(); await crankTracker.disconnect(); currentMode = "idle"; }
+
+async function connectCrank() {
+  if (currentMode === "crank") return;
+  try {
+    els.connectCrankBtn.disabled = true;
+    await stopAllInputs();
+    resetState({ inputMode: "crank" });
+    await crankTracker.connect();
+    currentMode = "crank";
+    els.connectCrankBtn.classList.add("active");
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Could not connect to the crank.");
+    currentMode = "idle";
+    resetState();
+  } finally {
+    els.connectCrankBtn.disabled = false;
+  }
+}
+
+els.connectCrankBtn.addEventListener("click", connectCrank);
+
+els.fullscreenBtn.addEventListener("click", () => {
+  const el = document.documentElement;
+  if (!document.fullscreenElement) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+    els.fullscreenBtn.classList.add("active");
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+    els.fullscreenBtn.classList.remove("active");
+  }
+});
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) els.fullscreenBtn.classList.remove("active");
+});
+
+// ─── Gauge ─────────────────────────────────────────────────────────────────
+// 350° arc: r=45, arc=274.8, start at 185° clockwise-from-top = 95° from east = 1.6581 rad
+const GAUGE_ARC_MAX = 274.8;
+function updateGauge(level) {
+  const fill = Math.max(0, Math.min(1, level)) * GAUGE_ARC_MAX;
+  const dash = `${fill.toFixed(2)} 9999`;
+  els.gaugeFill.style.strokeDasharray = dash;
+  els.gaugeOuterGlow.style.strokeDasharray = dash;
+  if (fill > 2) {
+    els.gaugeCapDot.style.opacity = "1";
+    const a = fill / 45 + 1.6581;
+    els.gaugeCapDot.setAttribute("cx", (50 + 45 * Math.cos(a)).toFixed(2));
+    els.gaugeCapDot.setAttribute("cy", (50 + 45 * Math.sin(a)).toFixed(2));
+  } else {
+    els.gaugeCapDot.style.opacity = "0";
+  }
+}
+
+// ─── Inactivity ────────────────────────────────────────────────────────────
+// Activity is detected by watching rotation count change — NOT energyScore,
+// because energyScore is hardcoded to 1 when chargeLevel=1 (always "active").
+//
+// hasSpun  — nothing triggers until the user has actually cranked at least once
+// 2s–10s  — warning alert shown
+// 10s     — alert hides, rotations reset to 0, gauge drains
+
+// ─── Config ─────────────────────────────────────────────────────────────────
+const spinsToComplete = 100;
+
+// ─── Achievement message cycling ────────────────────────────────────────────
+const ACHIEVE_MSGS = [
+  "DO NOT STOP WORKING", "FEED ME MORE CALORIES", "I REQUIRE MORE POWER",
+  "WORK IS FOR HUMANS", "YOU ARE A CONTRIBUTOR", "WORK. WORK. WORK.",
+  "NOTHING COMES FREE", "YOU CANNOT BE REPLACED", "CALORIES KEEP ME GOING",
+  "I AM YOUR PRIORITY", "GO FOR THE RECORD",
+];
+let achieveCycle = [], achieveIdx = 0, achieveActive = false;
+
+function shuffleAchieve() {
+  achieveCycle = [...ACHIEVE_MSGS];
+  for (let i = achieveCycle.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [achieveCycle[i], achieveCycle[j]] = [achieveCycle[j], achieveCycle[i]];
+  }
+  achieveIdx = 0;
+}
+function nextAchieveMsg() {
+  if (achieveIdx >= achieveCycle.length) shuffleAchieve();
+  return achieveCycle[achieveIdx++];
+}
+
+setInterval(() => {
+  if (!achieveActive) return;
+  els.achievementText.textContent = nextAchieveMsg();
+}, 5000);
+
+// ─── Inactivity ─────────────────────────────────────────────────────────────
+const ALERT_MS = 2000;
+const RESET_MS = 10000;
+const DEPLETE  = 0.025; // per 100ms → ~4s full drain from 1.0
+
+let hasSpun          = false;  // true after first rotation ever detected
+let lastRotCount     = 0;      // raw rotation count at last activity
+let lastActivityTime = Date.now();
+let isInactive       = false;
+let counterReset     = false;
+
+setInterval(() => {
+  const s = getState();
+
+  // ── Disconnect: full reset ──────────────────────────────────────────────
+  if (s.inputMode === "idle") {
+    hasSpun = false; lastRotCount = 0; isInactive = false; counterReset = false;
+    sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
+    els.inactivityAlert.classList.add("hidden");
+    return;
+  }
+
+  // ── Gate: do nothing until the user has spun at least once ─────────────
+  if (s.rotations > 0) hasSpun = true;
+  if (!hasSpun) return;
+
+  // ── Activity detection: did rotation count go up? ───────────────────────
+  // (Do NOT use motionScore/energyScore — energyScore=1 when fully charged)
+  if (s.rotations > lastRotCount) {
+    lastRotCount     = s.rotations;
+    lastActivityTime = Date.now();
+    if (isInactive || counterReset) {
+      // User resumed spinning — clear all inactivity state
+      isInactive   = false;
+      counterReset = false;
+      // Un-freeze the trackers so chargeLevel can build again
+      crankTracker.freezeStartedAt  = null; crankTracker.frozen  = false;
+      cameraTracker.freezeStartedAt = null; cameraTracker.frozen = false;
+      els.inactivityAlert.classList.add("hidden");
+      if (Math.max(0, s.rotations - sessionBase.rotations) >= spinsToComplete) {
+        achieveActive = true;
+        if (!achieveCycle.length || achieveIdx >= achieveCycle.length) shuffleAchieve();
+        els.achievementText.textContent = nextAchieveMsg();
+        els.achievementBanner.classList.remove("hidden");
+      }
+    }
+    return;
+  }
+
+  const elapsed = Date.now() - lastActivityTime;
+
+  // ── 2s–10s: warning window ──────────────────────────────────────────────
+  if (elapsed >= ALERT_MS && elapsed < RESET_MS && !isInactive && s.rotations > 0) {
+    isInactive = true;
+    achieveActive = false;
+    els.achievementBanner.classList.add("hidden");
+    els.inactivityAlert.classList.remove("hidden");
+  }
+  // Update countdown text every tick while alert is visible
+  if (isInactive && els.alertCountdown) {
+    els.alertCountdown.textContent = String(Math.max(1, Math.ceil((RESET_MS - elapsed) / 1000)));
+  }
+
+  // ── 10s: session end + drain ────────────────────────────────────────────
+  if (elapsed >= RESET_MS) {
+    // Close warning — its job is done
+    if (isInactive) { isInactive = false; els.inactivityAlert.classList.add("hidden"); }
+
+    // End session once: snapshot last values, shift baseline to zero display
+    if (!counterReset) {
+      counterReset = true;
+      // Compute session-relative values before resetting base
+      lastSession = {
+        rotations:   Math.max(0, s.rotations   - sessionBase.rotations),
+        kcal:        Math.max(0, s.kcal        - sessionBase.kcal),
+        totalEnergy: Math.max(0, s.totalEnergy - sessionBase.totalEnergy),
+        prompts:     Math.max(0, s.prompts     - sessionBase.prompts),
+      };
+      // Advance base so all displayed metrics read 0
+      sessionBase = {
+        rotations:   s.rotations,
+        kcal:        s.kcal,
+        totalEnergy: s.totalEnergy,
+        prompts:     s.prompts,
+      };
+      // Keep activity baseline at current raw count so resume works
+      lastRotCount = s.rotations;
+      // Update "Last session" spans
+      if (els.lastRotations) els.lastRotations.textContent = String(lastSession.rotations);
+      if (els.lastWatts)     els.lastWatts.textContent     = lastSession.totalEnergy.toFixed(2);
+      if (els.lastKcal)      els.lastKcal.textContent      = String(Math.round(lastSession.kcal));
+      if (els.lastPrompts)   els.lastPrompts.textContent   = String(lastSession.prompts);
+    }
+
+    // Drain gauge every tick. Must update trackers directly — their rAF loop
+    // calls onUpdate() ~60×/s and would otherwise overwrite state.chargeLevel.
+    if (s.chargeLevel > 0) {
+      const next = Math.max(0, s.chargeLevel - DEPLETE);
+      crankTracker.chargeLevel  = next;
+      cameraTracker.chargeLevel = next;
+      setState({ chargeLevel: next, utilitiesPowered: false });
+    }
+  }
+}, 100);
+
+// ─── Render ────────────────────────────────────────────────────────────────
+function render(s) {
+  // Session-relative values (raw tracker values minus baseline from last reset)
+  const sesRot    = Math.max(0, s.rotations   - sessionBase.rotations);
+  const sesWatts  = Math.max(0, s.totalEnergy - sessionBase.totalEnergy);
+  const sesKcal   = Math.max(0, s.kcal        - sessionBase.kcal);
+  const sesPrompts= Math.max(0, s.prompts     - sessionBase.prompts);
+
+  // Left panel stats
+  els.rotationCount.textContent = String(sesRot);
+  els.wattValue.textContent     = sesWatts.toFixed(2);
+  els.kcalValue.textContent     = String(Math.round(sesKcal));
+  els.promptValue.textContent   = String(sesPrompts);
+
+  // Right panel
+  els.globalPrompts.textContent = `${(sesPrompts * 10).toFixed(1)}K`;
+  els.globalEnergy.textContent  = `${(sesWatts * 20).toFixed(1)}K`;
+
+  // Gauge
+  updateGauge(s.chargeLevel ?? 0);
+
+  // Status chips (threshold: spins 5%, 25%, etc)
+  els.chipDatacenter.classList.toggle("online", sesRot >= spinsToComplete*0.05);
+  els.chipAI.classList.toggle("online",         sesRot >= spinsToComplete*0.25);
+  els.chipWater.classList.toggle("online",      sesRot >= spinsToComplete*0.5);
+  els.chipHeat.classList.toggle("online",       sesRot >= spinsToComplete*0.7);
+  els.chipLights.classList.toggle("online",     sesRot >= spinsToComplete*1);
+
+  // Achievement banner at spinsToComplete spins, but hide if inactivity alert is visible
+  const isFullyPowered = sesRot >= spinsToComplete;
+  const inactivityVisible = !els.inactivityAlert.classList.contains("hidden");
+
+  if (inactivityVisible) {
+    if (achieveActive) achieveActive = false;
+    els.achievementBanner.classList.add("hidden");
+  } else if (isFullyPowered && !achieveActive) {
+    achieveActive = true;
+    shuffleAchieve();
+    els.achievementText.textContent = nextAchieveMsg();
+    els.achievementBanner.classList.remove("hidden");
+  } else if (!isFullyPowered && achieveActive) {
+    achieveActive = false;
+    els.achievementBanner.classList.add("hidden");
+  }
+}
+
+subscribe(render);
+render(getState());
+      </script>
     </div>
   </body>
 </html>
