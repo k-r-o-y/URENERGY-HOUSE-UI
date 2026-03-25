@@ -229,30 +229,30 @@
 
         <!-- RIGHT: Global Contribution -->
         <section class="right-panel">
-          <div class="global-title">Global<br>Contribution</div>
-
-          <div class="global-block">
-            <div class="global-kicker">Total Energy Harvested</div>
-            <div id="globalEnergy" class="global-number">0</div>
-            <div class="global-sub">Watt &middot; All Contributors</div>
-          </div>
-
-          <div class="global-block">
-            <div class="global-kicker">Total Contributors</div>
-            <div class="global-number">2,000</div>
-            <div class="global-sub">Human count</div>
-          </div>
-
-          <div class="global-block">
-            <div class="global-kicker">Active Data Centers</div>
-            <div class="global-number">10</div>
-            <div class="global-sub">Supplied by UREnergy</div>
-          </div>
-
-          <div class="global-block">
-            <div class="global-kicker">Total AI Prompts</div>
-            <div id="globalPrompts" class="global-number">0</div>
-            <div class="global-sub">Number of Prompts</div>
+          <div class="session-glass">
+            <div class="session-header">Global Stats</div>
+            <div class="session-stats">
+              <div class="stat-item stat-item-right">
+                <div id="globalEnergy" class="stat-value">0</div>
+                <div class="stat-label">Energy Harvested</div>
+                <div class="stat-last">Watt &middot; All Contributors</div>
+              </div>
+              <div class="stat-item stat-item-right">
+                <div class="stat-value">2,000</div>
+                <div class="stat-label">Total Contributors</div>
+                <div class="stat-last">Human count</div>
+              </div>
+              <div class="stat-item stat-item-right">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Active Data Centers</div>
+                <div class="stat-last">Supplied by UREnergy</div>
+              </div>
+              <div class="stat-item stat-item-right">
+                <div id="globalPrompts" class="stat-value">0</div>
+                <div class="stat-label">Total AI Prompts</div>
+                <div class="stat-last">Number of Prompts</div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -893,7 +893,7 @@ function render(s) {
 
   // Left panel stats
   els.rotationCount.textContent = String(sesRot);
-  els.wattValue.textContent     = sesWatts.toFixed(2);
+  els.wattValue.textContent     = sesWatts.toFixed(1);
   els.kcalValue.textContent     = String(Math.round(sesKcal));
   els.promptValue.textContent   = String(sesPrompts);
 
@@ -905,11 +905,11 @@ function render(s) {
   updateGauge(s.chargeLevel ?? 0);
 
   // Status chips (threshold: spins 5%, 25%, etc)
-  els.chipDatacenter.classList.toggle("online", sesRot >= spinsToComplete*0.05);
-  els.chipAI.classList.toggle("online",         sesRot >= spinsToComplete*0.25);
-  els.chipWater.classList.toggle("online",      sesRot >= spinsToComplete*0.5);
-  els.chipHeat.classList.toggle("online",       sesRot >= spinsToComplete*0.7);
-  els.chipLights.classList.toggle("online",     sesRot >= spinsToComplete*1);
+  els.chipDatacenter.classList.toggle("online", sesRot >= spinsToComplete*0.08);
+  els.chipAI.classList.toggle("online",         sesRot >= spinsToComplete*0.4);
+  els.chipWater.classList.toggle("online",      sesRot >= spinsToComplete*0.6);
+  els.chipHeat.classList.toggle("online",       sesRot >= spinsToComplete*0.75);
+  els.chipLights.classList.toggle("online",     sesRot >= spinsToComplete*0.92);
 
   // Achievement banner at spinsToComplete spins, but hide if inactivity alert is visible
   const isFullyPowered = sesRot >= spinsToComplete;
