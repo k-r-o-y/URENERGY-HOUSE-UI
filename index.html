@@ -69,6 +69,11 @@
 
         <!-- CENTER: Gauge + House -->
         <section class="center-panel">
+          <!-- Logo -->
+          <div class="logo-badge">
+            <img src="./LogoWhite.svg" alt="UREnergy Logo" class="logo-img"/>
+          </div>
+
           <div class="house-gauge-wrapper">
 
             <!-- Gauge SVG ring (sits behind house) -->
@@ -233,24 +238,27 @@
             <div class="session-header">Global Stats</div>
             <div class="session-stats">
               <div class="stat-item stat-item-right">
-                <div id="globalEnergy" class="stat-value">0</div>
+                <div id="statHumans" class="stat-value">0</div>
+                <div class="stat-label">Human Generators</div>
+                <div class="stat-last">Attempts at Using URENERGY</div>
+              </div>
+              <div class="stat-item stat-item-right">
+                <div id="statEnergy" class="stat-value">0.00K</div>
                 <div class="stat-label">Energy Harvested</div>
-                <div class="stat-last">Watt &middot; All Contributors</div>
+                <div class="stat-last">2.5 Watts Per Prompt</div>
               </div>
               <div class="stat-item stat-item-right">
-                <div class="stat-value">2,000</div>
-                <div class="stat-label">Total Contributors</div>
-                <div class="stat-last">Human count</div>
+                <div id="statCalories" class="stat-value">0</div>
+                <div class="stat-label">Calories Converted</div>
+                <div class="stat-last">From People Like You</div>
               </div>
               <div class="stat-item stat-item-right">
-                <div class="stat-value">10</div>
-                <div class="stat-label">Active Data Centers</div>
-                <div class="stat-last">Supplied by UREnergy</div>
-              </div>
-              <div class="stat-item stat-item-right">
-                <div id="globalPrompts" class="stat-value">0</div>
-                <div class="stat-label">Total AI Prompts</div>
-                <div class="stat-last">Number of Prompts</div>
+                <div class="prompts-today-wrap">
+                  <div id="statPromptsToday" class="stat-value prompts-today-value">—</div>
+                  <span id="promptsIncrement" class="prompts-increment" aria-hidden="true">+28,935</span>
+                </div>
+                <div class="stat-label">AI Prompts Today</div>
+                <div class="stat-last">28,935 Prompts Per Second</div>
               </div>
             </div>
           </div>
@@ -465,8 +473,11 @@ const els = {
   wattValue:      document.getElementById("wattValue"),
   kcalValue:      document.getElementById("kcalValue"),
   promptValue:    document.getElementById("promptValue"),
-  globalPrompts:  document.getElementById("globalPrompts"),
-  globalEnergy:   document.getElementById("globalEnergy"),
+  statHumans:       document.getElementById("statHumans"),
+  statEnergy:       document.getElementById("statEnergy"),
+  statCalories:     document.getElementById("statCalories"),
+  statPromptsToday:  document.getElementById("statPromptsToday"),
+  promptsIncrement:  document.getElementById("promptsIncrement"),
   gaugeFill:        document.getElementById("gaugeFill"),
   gaugeOuterGlow:   document.getElementById("gaugeOuterGlow"),
   gaugeCapDot:      document.getElementById("gaugeCapDot"),
@@ -516,6 +527,59 @@ function displayRecords() {
   if (els.recordWatts)     els.recordWatts.textContent     = rec.watts     !== null ? String(rec.watts)               : "—";
   if (els.recordKcal)      els.recordKcal.textContent      = rec.kcal      !== null ? String(rec.kcal)                : "—";
   if (els.recordPrompts)   els.recordPrompts.textContent   = rec.prompts   !== null ? String(rec.prompts)             : "—";
+}
+function clearRecords() {
+  Object.values(REC_KEYS).forEach(k => localStorage.removeItem(k));
+}
+
+// ─── Global cumulative stats (localStorage) ──────────────────────────────────
+const GLOB_KEYS = { humans: 'ure_humans', energy: 'ure_energy_total', calories: 'ure_cal_total' };
+function loadGlobals() {
+  return {
+    humans:   parseInt(localStorage.getItem(GLOB_KEYS.humans)   || '0', 10) || 0,
+    energy:   parseFloat(localStorage.getItem(GLOB_KEYS.energy)   || '0') || 0,
+    calories: parseFloat(localStorage.getItem(GLOB_KEYS.calories) || '0') || 0,
+  };
+}
+function saveGlobals(g) {
+  localStorage.setItem(GLOB_KEYS.humans,   g.humans);
+  localStorage.setItem(GLOB_KEYS.energy,   g.energy);
+  localStorage.setItem(GLOB_KEYS.calories, g.calories);
+}
+function clearGlobals() {
+  Object.values(GLOB_KEYS).forEach(k => localStorage.removeItem(k));
+}
+function fmtShort(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  return (n / 1e3).toFixed(2) + 'K';
+}
+function fmtEnergy(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+  return n.toFixed(2);
+}
+function displayGlobals() {
+  const g = loadGlobals();
+  if (els.statHumans)   els.statHumans.textContent   = String(g.humans);
+  if (els.statEnergy)   els.statEnergy.textContent   = fmtEnergy(g.energy);
+  if (els.statCalories) els.statCalories.textContent = String(Math.round(g.calories));
+}
+function updatePromptsToday() {
+  if (!els.statPromptsToday) return;
+  const now   = new Date();
+  const secs  = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const total = secs * 28935;
+  // Full number with commas (e.g. "1,249,992,000")
+  els.statPromptsToday.textContent = total.toLocaleString();
+  // Trigger float-up animation on the increment label
+  if (els.promptsIncrement && secs > 0) {
+    els.promptsIncrement.classList.remove('prompts-pop');
+    // Force reflow so removing + re-adding the class restarts the animation
+    void els.promptsIncrement.offsetWidth;
+    els.promptsIncrement.classList.add('prompts-pop');
+  }
 }
 
 // ─── Three.js GLB viewer (deferred + guarded) ───────────────────────────────
@@ -604,11 +668,39 @@ window.addEventListener('load', function() {
     try { new ResizeObserver(resize).observe(container); } catch(_) { window.addEventListener('resize', resize); }
 
     let model = null, floatT = 0, autoRot = 0, lastTs = 0;
+    let glbVelocity = 0, glbPrevRot = -1, glbPrevTs = 0;
     function animate(ts) {
       requestAnimationFrame(animate);
       const dt = Math.min((ts - lastTs) / 1000, 0.05); lastTs = ts;
       if (model) {
-        floatT += dt; autoRot += dt * 0.25;
+        floatT += dt;
+
+        // ── Rotation-rate-based spin ──────────────────────────────────────
+        const s = getState();
+        if (s.inputMode === 'idle') {
+          // Reset button pressed or no input — snap back to base immediately
+          glbVelocity = 0;
+          glbPrevRot  = -1;
+          glbPrevTs   = 0;
+        } else if (s.rotations !== glbPrevRot) {
+          // A new rotation just ticked in — measure how fast
+          if (glbPrevTs > 0 && glbPrevRot >= 0) {
+            const elapsed = (ts - glbPrevTs) / 1000;
+            if (elapsed > 0.04 && elapsed < 3) {
+              const rps    = Math.max(0, s.rotations - glbPrevRot) / elapsed;
+              const target = Math.min(1, rps / 2); // 2 rps = full speed
+              glbVelocity += (target - glbVelocity) * 0.5; // snap up quickly
+            }
+          }
+          glbPrevRot = s.rotations;
+          glbPrevTs  = ts;
+        } else {
+          // No new rotations — decay smoothly back to 0
+          glbVelocity = Math.max(0, glbVelocity - dt * 1.2);
+        }
+
+        const spinSpeed = 0.25 + glbVelocity * 2.25;
+        autoRot += dt * spinSpeed;
         model.rotation.y = autoRot;
         model.position.y = Math.sin(floatT * 0.7) * 0.18;
       }
@@ -718,10 +810,18 @@ els.resetBtn.addEventListener("click", () => {
   els.inactivityAlert.classList.add("hidden");
   // Force state update so gauge drains to 0
   setState({ chargeLevel: 0, utilitiesPowered: false, inputMode: "idle" });
+  // Clear global cumulative stats and personal records
+  clearGlobals();
+  displayGlobals();
+  clearRecords();
+  displayRecords();
 });
 
-// ─── Load records on startup ─────────────────────────────────────────────────
+// ─── Startup: load persisted data + start AI Prompts Today clock ─────────────
 displayRecords();
+displayGlobals();
+updatePromptsToday();
+setInterval(updatePromptsToday, 1000);
 
 // ─── Gauge ─────────────────────────────────────────────────────────────────
 // 350° arc: r=45, arc=274.8, start at 185° clockwise-from-top = 95° from east = 1.6581 rad
@@ -869,6 +969,13 @@ setInterval(() => {
       lastRotCount = s.rotations;
       // Check and update personal records
       updateRecords(lastSession.rotations, lastSession.totalEnergy, lastSession.kcal, lastSession.prompts);
+      // Accumulate global stats
+      const g = loadGlobals();
+      g.humans++;
+      g.energy   += lastSession.totalEnergy;
+      g.calories += lastSession.kcal;
+      saveGlobals(g);
+      displayGlobals();
     }
 
     // Drain gauge every tick. Must update trackers directly — their rAF loop
@@ -896,10 +1003,6 @@ function render(s) {
   els.wattValue.textContent     = sesWatts.toFixed(1);
   els.kcalValue.textContent     = String(Math.round(sesKcal));
   els.promptValue.textContent   = String(sesPrompts);
-
-  // Right panel
-  els.globalPrompts.textContent = `${(sesPrompts * 10).toFixed(1)}K`;
-  els.globalEnergy.textContent  = `${(sesWatts * 20).toFixed(1)}K`;
 
   // Gauge
   updateGauge(s.chargeLevel ?? 0);

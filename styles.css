@@ -51,6 +51,32 @@ body {
   position: relative;
 }
 
+/* ─── Logo Badge ──────────────────────────────────────────────────────────── */
+.logo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 8000;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.logo-badge:hover {
+  opacity: 0.75;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
 /* ─── Corner Icon Buttons ────────────────────────────────────────────────── */
 .corner-icons {
   position: fixed;
@@ -158,6 +184,44 @@ body {
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.03em;
+}
+
+/* AI Prompts Today: full number, shrink to fit */
+.prompts-today-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.prompts-today-value {
+  font-size: clamp(1rem, 2.2vw, 2.8rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  display: block;
+  max-width: 100%;
+}
+
+.prompts-increment {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: clamp(0.7rem, 1vw, 1rem);
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.prompts-increment.prompts-pop {
+  animation: promptFloat 0.9s ease-out forwards;
+}
+
+@keyframes promptFloat {
+  0%   { opacity: 1;   transform: translateY(0);     }
+  30%  { opacity: 1;   transform: translateY(-6px);  }
+  100% { opacity: 0;   transform: translateY(-18px); }
 }
 
 .stat-label {
