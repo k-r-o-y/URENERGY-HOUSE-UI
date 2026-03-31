@@ -3,8 +3,9 @@ function clamp(value, min = 0, max = 1) {
 }
 
 export class CrankTracker {
-  constructor({ onUpdate }) {
+  constructor({ onUpdate, spinsToComplete = 100 }) {
     this.onUpdate = onUpdate;
+    this.spinsToComplete = spinsToComplete;
 
     this.port = null;
     this.reader = null;
@@ -33,6 +34,7 @@ export class CrankTracker {
 
     this.rotationBurst = 0;
     this.finalSeconds = 0;
+    this.paused = false;
   }
 
   async connect() {
@@ -92,6 +94,7 @@ export class CrankTracker {
   handleLine(line) {
     const t = line.trim();
     if (!t) return;
+    if (this.paused) return;
 
     if (t.startsWith("SPINS:")) {
       const raw = parseInt(t.slice(6), 10);
@@ -172,19 +175,10 @@ export class CrankTracker {
       this.totalEnergy = this.totalRotations * 3.52;
       this.prompts = Math.floor(this.totalEnergy / 12.5);
 
-      const rotationBoost = rotationsThisFrame * 0.012;
-      const fillRate =
-        this.displayMotion * 0.2 +
-        Math.pow(this.displayMotion, 1.4) * 0.65 +
-        rotationBoost;
+      // Use spin-count-based chargeLevel, matching keyboard logic
+      this.chargeLevel = clamp(this.totalRotations / this.spinsToComplete);
 
-      this.chargeLevel = clamp(this.chargeLevel + fillRate * dt);
-
-      if (this.chargeLevel > 0.9 && this.chargeLevel < 1) {
-        this.chargeLevel = clamp(this.chargeLevel + 0.01);
-      }
-
-      if (this.chargeLevel >= 0.995) {
+      if (this.chargeLevel >= 1) {
         this.chargeLevel = 1;
         this.freezeStartedAt = now;
         this.finalSeconds = Math.floor((now - this.startTime) / 1000);

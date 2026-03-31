@@ -113,6 +113,7 @@ const cameraTracker = new MotionTracker({
 
 const crankTracker = new CrankTracker({
   onUpdate: setState,
+  spinsToComplete,
 });
 
 const keyboardTracker = {
@@ -331,7 +332,7 @@ async function startTestFill() {
   currentMode = "crank";
 
   const totalSteps = spinsToComplete;
-  const intervalMs = 60;
+  const intervalMs = 30;
   let step = 0;
 
   testFillRunning = true;
@@ -371,6 +372,7 @@ document.addEventListener("keydown", (e) => {
   if (e.code !== "Space") return;
   e.preventDefault();
 
+  if (isDraining) return;
   if (currentMode === "camera") return;
   if (currentMode === "crank" && !keyboardTracker.running) return;
 
@@ -565,7 +567,7 @@ setInterval(() => {
 
 /* -------------------- INACTIVITY / DECAY -------------------- */
 
-const ALERT_MS = 6000;
+const ALERT_MS = 3000;
 const RESET_MS = 14000;
 const DEPLETE = 0.025;
 
@@ -574,6 +576,7 @@ let lastRotCount = 0;
 let lastActivityTime = Date.now();
 let isInactive = false;
 let counterReset = false;
+let isDraining = false;
 
 setInterval(() => {
   const s = getState();
@@ -583,6 +586,8 @@ setInterval(() => {
     lastRotCount = 0;
     isInactive = false;
     counterReset = false;
+    isDraining = false;
+    crankTracker.paused = false;
     sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
     els.inactivityAlert?.classList.add("hidden");
     return;
@@ -598,6 +603,8 @@ setInterval(() => {
     if (isInactive || counterReset) {
       isInactive = false;
       counterReset = false;
+      isDraining = false;
+      crankTracker.paused = false;
 
       crankTracker.freezeStartedAt = null;
       crankTracker.frozen = false;
@@ -670,11 +677,16 @@ setInterval(() => {
     }
 
     if (s.chargeLevel > 0) {
+      isDraining = true;
+      crankTracker.paused = true;
       const next = Math.max(0, s.chargeLevel - DEPLETE);
       crankTracker.chargeLevel = next;
       cameraTracker.chargeLevel = next;
       keyboardTracker.chargeLevel = next;
       setState({ chargeLevel: next, utilitiesPowered: false });
+    } else {
+      isDraining = false;
+      crankTracker.paused = false;
     }
   }
 }, 100);
@@ -702,7 +714,7 @@ function render(s) {
   els.chipWater?.classList.toggle("online", level >= 0.58);
   els.chipAI?.classList.toggle("online", level >= 0.93);
 
-  const isFullyPowered = level >= 0.85;
+  const isFullyPowered = level >= 1;
   const inactivityVisible = !els.inactivityAlert?.classList.contains("hidden");
 
   if (inactivityVisible) {
