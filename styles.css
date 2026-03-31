@@ -479,22 +479,22 @@ body {
 
 .chip-br {
   bottom: 24%;
-  left: 15%;
+  left: 1%;
 }
 
 .chip-tl {
   top: 12%;
-  left: 14%;
+  left: 8%;
 }
 
 .chip-tr {
   top: 12%;
-  right: 14%;
+  right: 8%;
 }
 
 .chip-bl {
   bottom: 24%;
-  right: 8%;
+  right: 1%;
 }
 
 .chip-r {
