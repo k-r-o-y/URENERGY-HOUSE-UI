@@ -3,234 +3,435 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>U(R)Energy</title>
+    <title>U(R)Energy v3</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="app-shell">
-      <header class="topbar">
-        <div class="brand">U(R)Energy</div>
-        <div class="headline">YOUR ENERGY . OUR FUTURE .</div>
-        <div class="controls">
-          <button id="startCameraBtn" class="start-btn">Start Camera</button>
-          <button id="connectCrankBtn" class="start-btn">Connect Crank</button>
-        </div>
-      </header>
+
+      <div class="top-left-logo">
+        <img src="./logo.svg" alt="Logo" />
+      </div>
+      <div class="corner-icons">
+        <button id="startCameraBtn" class="icon-btn" aria-label="Start Camera" style="display: none"></button>
+
+        <button id="connectCrankBtn" class="icon-btn" aria-label="Connect Crank" title="Connect Crank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M8 2v4M16 2v4"></path>
+            <rect x="7" y="6" width="10" height="7" rx="2"></rect>
+            <path d="M12 13v9"></path>
+          </svg>
+        </button>
+
+        <button id="testFillBtn" class="icon-btn" aria-label="Test Fill" title="Test Fill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"></path>
+            <path d="M13 6l6 6-6 6"></path>
+          </svg>
+        </button>
+
+        <button id="fullscreenBtn" class="icon-btn" aria-label="Enter Fullscreen" title="Enter Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"></path>
+          </svg>
+        </button>
+
+        <button id="resetBtn" class="icon-btn" aria-label="Reset Session" title="Reset Session">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.51"></path>
+          </svg>
+        </button>
+      </div>
 
       <main class="dashboard">
-        <section class="left-panel panel">
-          <div class="session-block">
-            <div id="rotationCount" class="big-number">0</div>
-            <div class="micro-label">ROTATIONS . THIS SESSION</div>
-          </div>
+        <section class="left-panel">
+          <div class="session-glass">
+            <div class="session-header">This Session</div>
+            <div class="session-stats">
+              <div class="stat-item">
+                <div id="rotationCount" class="stat-value">0</div>
+                <div class="stat-label">Rotations</div>
+                <div class="stat-last">Record: <span id="recordRotations">—</span></div>
+              </div>
 
-          <div class="stat-grid">
-            <div class="stat-cell">
-              <div id="wattValue" class="stat-number">0.00</div>
-              <div class="stat-label">Watt</div>
-            </div>
-            <div class="stat-cell">
-              <div id="kcalValue" class="stat-number">0</div>
-              <div class="stat-label">kcal burned</div>
-            </div>
-            <div class="stat-cell">
-              <div id="timeValue" class="stat-number">0:00</div>
-              <div class="stat-label">Time spent</div>
-            </div>
-            <div class="stat-cell">
-              <div id="promptValue" class="stat-number">0</div>
-              <div class="stat-label">AI prompts</div>
-            </div>
-          </div>
+              <div class="stat-item">
+                <div id="wattValue" class="stat-value">0.0</div>
+                <div class="stat-label">Watts Produced</div>
+                <div class="stat-last">Record: <span id="recordWatts">—</span></div>
+              </div>
 
-          <div class="mode-row">
-            <span class="mode-label">Input mode</span>
-            <span id="modeValue" class="mode-value">IDLE</span>
-          </div>
+              <div class="stat-item">
+                <div id="kcalValue" class="stat-value">0</div>
+                <div class="stat-label">Calories Burned</div>
+                <div class="stat-last">Record: <span id="recordKcal">—</span></div>
+              </div>
 
-          <div class="split-block">
-            <div class="split-row">
-              <span>Your energy</span>
-              <span id="userShareValue">20%</span>
+              <div class="stat-item">
+                <div id="promptValue" class="stat-value">0</div>
+                <div class="stat-label">AI Prompts Powered</div>
+                <div class="stat-last">Record: <span id="recordPrompts">—</span></div>
+              </div>
             </div>
-            <div class="bar"><div id="userShareBar" class="fill cyan"></div></div>
-
-            <div class="split-row">
-              <span>UREnergy fee</span>
-              <span>80%</span>
-            </div>
-            <div class="bar"><div class="fill pink fixed-80"></div></div>
           </div>
         </section>
 
-        <section class="center-panel panel">
-          <div class="center-title">ENERGY DISTRIBUTED TO YOUR HOUSE . LIVE</div>
+        <section class="center-panel">
+          <div class="house-gauge-wrapper">
+            <div class="meter-logo-badge" id="meterLogoBadge">
+              <img src="./LogoWhite.svg" alt="UREnergy Logo" class="meter-logo-img" />
+            </div>
 
-          <div class="house-stage">
-            <svg class="house-svg" viewBox="0 0 820 560">
-              <g transform="translate(-36, 18) scale(0.94)">
-                <!-- chimney smoke -->
-                <g id="chimneySmoke" class="smoke-group">
-                  <circle class="smoke puff-1" cx="556" cy="36" r="11"></circle>
-                  <circle class="smoke puff-2" cx="566" cy="18" r="15"></circle>
-                  <circle class="smoke puff-3" cx="578" cy="-4" r="18"></circle>
-                </g>
-          
-                <!-- roof -->
-                <polygon
-                points="200,126 620,126 592,82 228,82"
-                class="roof-top"
-              />
-<rect x="530" y="40" width="34" height="58" class="chimney" />
-<rect x="525" y="30" width="44" height="14" class="chimney-cap" />
+            <svg class="gauge-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" id="gaugeSvg">
+              <defs>
+                <filter id="gaugeGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur1"></feGaussianBlur>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur2"></feGaussianBlur>
+                  <feMerge>
+                    <feMergeNode in="blur1"></feMergeNode>
+                    <feMergeNode in="blur2"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
 
-<!-- roof tile lines -->
-<line x1="244" y1="96" x2="576" y2="96" class="roof-tile-line" />
-<line x1="236" y1="108" x2="590" y2="108" class="roof-tile-line" />
-<line x1="224" y1="120" x2="602" y2="120" class="roof-tile-line" />
-<line x1="270" y1="88" x2="252" y2="126" class="roof-tile-seam" />
-<line x1="320" y1="88" x2="304" y2="126" class="roof-tile-seam" />
-<line x1="370" y1="88" x2="356" y2="126" class="roof-tile-seam" />
-<line x1="420" y1="88" x2="408" y2="126" class="roof-tile-seam" />
-<line x1="470" y1="88" x2="460" y2="126" class="roof-tile-seam" />
-<line x1="520" y1="88" x2="512" y2="126" class="roof-tile-seam" />
-          
-                <!-- outer structure -->
-                <rect x="205" y="120" width="410" height="330" class="house-shell" />
-                <rect x="205" y="270" width="410" height="18" class="floor-divider" />
-                <rect x="205" y="120" width="18" height="330" class="frame" />
-                <rect x="597" y="120" width="18" height="330" class="frame" />
-                <rect x="205" y="432" width="410" height="18" class="frame" />
+                <filter id="gaugeOuterGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
+                  <feMerge>
+                    <feMergeNode in="blur"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
+              </defs>
 
-                <!-- outer wall faces -->
-<rect x="223" y="126" width="374" height="12" class="outer-wall" />
-<rect x="223" y="138" width="12" height="294" class="outer-wall" />
-<rect x="585" y="138" width="12" height="294" class="outer-wall" />
-<rect x="223" y="420" width="374" height="12" class="outer-wall" />
-          
-                <!-- upper rooms -->
-                <rect x="223" y="138" width="180" height="132" class="room room-bedroom" />
-                <rect x="421" y="138" width="176" height="132" class="room room-bath" />
-          
-                <!-- lower rooms -->
-                <rect x="223" y="288" width="260" height="144" class="room room-kitchen" />
-                <rect x="501" y="288" width="96" height="144" class="room room-utility" />
-          
-                <!-- upper left bedroom -->
-                <rect x="254" y="226" width="88" height="18" class="bed-base" />
-                <rect x="246" y="212" width="28" height="20" class="pillow" />
-                <rect x="336" y="202" width="30" height="42" id="utility-radiator" class="utility-shape off heat-shape" />
-                <circle cx="319" cy="160" r="7" id="utility-light-bedroom" class="utility-shape off light-shape" />
-                <path d="M319 160 L319 194" class="fixture-line" />
-                <polygon points="292,194 346,194 330,208 308,208" class="lamp-shade" />
-          
-                <!-- upper middle boiler -->
-                <rect x="386" y="164" width="34" height="62" id="utility-boiler" class="utility-shape off power-shape" rx="5" />
-                <circle cx="403" cy="192" r="8" class="boiler-dial" />
-                <line x1="396" y1="226" x2="396" y2="270" class="pipe" />
-                <line x1="410" y1="226" x2="410" y2="270" class="pipe" />
-          
-                <!-- upper right bathroom -->
-                <rect x="472" y="198" width="56" height="20" class="bathtub" rx="6" />
-                <rect x="541" y="218" width="26" height="22" class="toilet" rx="4" />
-                <rect x="500" y="182" width="42" height="10" class="sink" rx="4" />
-                <circle cx="506" cy="160" r="7" id="utility-light-bathroom" class="utility-shape off light-shape" />
-                <path d="M506 160 L506 192" class="fixture-line" />
-                <polygon points="478,192 534,192 520,205 492,205" class="lamp-shade" />
-          
-                <!-- lower kitchen -->
-                <rect x="250" y="374" width="48" height="40" class="cabinet" />
-                <rect x="303" y="374" width="58" height="40" class="cabinet" />
-                <rect x="366" y="374" width="52" height="40" class="cabinet" />
-                <rect x="285" y="340" width="106" height="16" class="countertop" />
-                <rect x="318" y="350" width="28" height="18" class="sink-basin" />
-                <rect x="404" y="360" width="34" height="54" class="appliance" />
-                <circle cx="421" cy="387" r="10" class="washer-door" />
-                <circle cx="338" cy="322" r="7" id="utility-light-kitchen" class="utility-shape off light-shape" />
-                <path d="M338 322 L338 352" class="fixture-line" />
-                <polygon points="310,352 366,352 350,364 326,364" class="lamp-shade" />
-          
-                <!-- water / utility room -->
-                <rect x="545" y="338" width="34" height="66" id="utility-water-tank" class="utility-shape off water-shape" rx="6" />
-                <rect x="520" y="392" width="28" height="22" id="utility-pump" class="utility-shape off power-shape" rx="4" />
-                <line x1="560" y1="404" x2="560" y2="432" class="pipe" />
-                <line x1="548" y1="404" x2="548" y2="432" class="pipe" />
-                <rect x="512" y="324" width="72" height="8" class="utility-shelf" />
-          
-                <!-- front door -->
-                <rect x="228" y="324" width="62" height="96" class="front-door-arch" rx="28" />
-                <rect x="238" y="336" width="42" height="74" class="front-door" rx="18" />
-                <rect x="250" y="352" width="12" height="38" class="door-window" />
-                <rect x="266" y="352" width="12" height="38" class="door-window" />
-          
-                <!-- endpoint -->
-                <g transform="translate(640,195)">
-                  <rect x="0" y="0" width="112" height="72" class="endpoint-box" rx="10" />
-                  <text x="56" y="24" text-anchor="middle" class="endpoint-title">ENDPOINT</text>
-                  <text x="56" y="48" text-anchor="middle" id="endpointLabel" class="endpoint-text">Awaiting</text>
-                </g>
-          
-                <!-- energy dots -->
-                <g id="energyDots"></g>
-              </g>
+              <path class="gauge-track" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <path class="gauge-outer-glow" id="gaugeOuterGlow" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <path class="gauge-fill" id="gaugeFill" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <circle class="gauge-cap-dot" id="gaugeCapDot" cx="26" cy="88" r="2.2"></circle>
             </svg>
-          </div>
 
-          <div class="cap-row">
-            <div>
-              <div class="cap-title">Energy Cap</div>
-              <div class="cap-sub">Crank to fill</div>
-            </div>
-            <div class="cap-right">
-              <div id="capPercent">0%</div>
-              <div class="bar wide"><div id="capFill" class="fill cyan"></div></div>
-            </div>
-          </div>
+            <div class="house-float-wrapper" id="houseFallback" aria-hidden="true">
+              <svg
+                id="houseSvg"
+                class="house-single-svg"
+                width="1280"
+                height="832"
+                viewBox="0 0 1280 832"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <clipPath id="clip0_152_30">
+                    <rect width="1280" height="832" fill="white" />
+                  </clipPath>
+                  <clipPath id="washerWaterClip">
+                    <circle cx="987.5" cy="741.5" r="29.5" />
+                  </clipPath>
+                </defs>
 
-          <div class="energized-panel">
-            <div class="energized-title">ENERGIZED UTILITIES</div>
-            <div class="energized-list">
-              <div id="statusLights" class="utility-pill off">Lights</div>
-              <div id="statusWater" class="utility-pill off">Water</div>
-              <div id="statusHeat" class="utility-pill off">Heating</div>
-              <div id="statusPower" class="utility-pill off">Power / Boiler</div>
-              <div id="statusSmoke" class="utility-pill off">Chimney Exhaust</div>
+                <g clip-path="url(#clip0_152_30)">
+                  <rect x="153" y="772" width="960" height="16" fill="#D9D9D9"/>
+                  <rect x="243" y="486" width="842" height="15" fill="#D9D9D9"/>
+                  <rect x="566" y="284" width="10" height="501" fill="#D9D9D9"/>
+                  <rect x="1054" y="351" width="22" height="421" fill="#D9D9D9"/>
+                  <rect x="298" y="497" width="10" height="275" fill="#D9D9D9"/>
+                  <rect x="481.114" y="260.846" width="611.811" height="15.7242" transform="rotate(8 481.114 260.846)" fill="#D9D9D9"/>
+                  <rect x="383" y="410" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="383" y="448" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="383" y="429" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="373" y="401" width="10" height="85" fill="#D9D9D9"/>
+                  <rect x="383" y="467" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="904" y="500" width="9" height="271" fill="#D9D9D9"/>
+                  <rect x="586.5" y="408.5" width="134.707" height="27" stroke="#D9D9D9"/>
+                  <rect x="586.5" y="448.5" width="134.707" height="27" stroke="#D9D9D9"/>
+                  <rect x="586" y="476" width="4.98922" height="8" fill="#D9D9D9"/>
+                  <rect x="716.718" y="476" width="4.98922" height="8" fill="#D9D9D9"/>
+                  <rect x="591" y="437" width="126" height="17" rx="2" fill="#D9D9D9"/>
+                  <path d="M697.962 427.011C698.969 427.113 699.754 427.964 699.754 429V438C699.754 439.105 698.861 440 697.759 440H674.808C673.706 440 672.812 439.105 672.812 438V429L672.823 428.796C672.925 427.787 673.775 427 674.808 427H697.759L697.962 427.011Z" fill="#928D8D"/>
+                  <rect x="586" y="436" width="3.99138" height="12" fill="#D9D9D9"/>
+                  <rect x="717.716" y="436" width="3.99138" height="12" fill="#D9D9D9"/>
+                  <path d="M634.1 427.011C635.107 427.113 635.892 427.964 635.892 429V438C635.892 439.105 634.999 440 633.897 440H610.946C609.844 440 608.95 439.105 608.95 438V429L608.961 428.796C609.063 427.787 609.913 427 610.946 427H633.897L634.1 427.011Z" fill="#928D8D"/>
+                  <rect x="608.95" y="431" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="608.95" y="429" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="672.812" y="431" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="672.812" y="429" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="999" y="359" width="2" height="127" fill="#D9D9D9"/>
+                  <path d="M1042 359H1044V486H1042V359Z" fill="#D9D9D9"/>
+
+                  <rect x="1003.25" y="376.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="359.5" width="36.6061" height="14" stroke="#D9D9D9"/>
+                  <rect x="1003.5" y="464.5" width="36" height="16" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="398.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="420.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="442.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+
+                  <rect x="663.832" y="369" width="178.614" height="2" fill="#D9D9D9"/>
+                  <rect x="663.832" y="390" width="178.614" height="2" fill="#D9D9D9"/>
+                  <path d="M663.832 371H665.827V390H663.832V371Z" fill="#D9D9D9"/>
+                  <rect x="796.545" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="708.735" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="752.64" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="840.45" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+
+                  <rect x="652.855" y="301" width="0.997845" height="39.2" fill="#D9D9D9"/>
+                  <path d="M640.881 348H665.827C665.827 348.552 665.38 349 664.827 349H641.881C641.329 349 640.881 348.552 640.881 348Z" fill="#D9D9D9"/>
+                  <path d="M640.881 348C640.881 346.343 642.224 345 643.881 345H662.827C664.484 345 665.827 346.343 665.827 348H640.881Z" fill="#D9D9D9"/>
+                  <rect x="651.858" y="340.2" width="2.99353" height="5.44444" fill="#D9D9D9"/>
+                  <rect id="light-bedroom" class="house-light" x="640.881" y="348" width="24.946" height="1.5" rx="0.75" fill="#2b3b48"/>
+
+<!-- mirror -->
+<rect x="901.819" y="374.5" width="28.9353" height="41" rx="0.5" stroke="#D9D9D9"/>
+
+<!-- faint mirror panel fill -->
+<rect
+  id="mirror-panel"
+  class="mirror-panel"
+  x="903.1"
+  y="375.8"
+  width="26.3"
+  height="38.4"
+  rx="0.4"
+  fill="#1a2730"
+/>
+
+<circle id="mirror-dot" class="mirror-dot" cx="916" cy="412" r="1.65" fill="#1a2730"/>
+
+<!-- mirror signal: like phone wifi, slightly bigger, sideways -->
+<path
+  id="mirror-signal-left-1"
+  class="mirror-signal"
+  d="M913.9 410.9C912.7 410.0 911.8 409.0 911.1 407.7"
+/>
+
+<path
+  id="mirror-signal-left-2"
+  class="mirror-signal"
+  d="M914.7 412.5C912.9 411.4 911.5 410.0 910.4 408.0"
+/>
+
+<path
+  id="mirror-signal-right-1"
+  class="mirror-signal"
+  d="M918.1 410.9C919.3 410.0 920.2 409.0 920.9 407.7"
+/>
+
+<path
+  id="mirror-signal-right-2"
+  class="mirror-signal"
+  d="M917.3 412.5C919.1 411.4 920.5 410.0 921.6 408.0"
+/>
+
+                  <!-- phone -->
+                  <rect x="727.694" y="450" width="35.9224" height="3" fill="#D9D9D9"/>
+                  <rect x="729.689" y="454" width="31.931" height="11" fill="#D9D9D9"/>
+                  <rect x="729.689" y="466" width="31.931" height="11" fill="#D9D9D9"/>
+                  <rect x="729.689" y="477" width="2.99353" height="7" fill="#D9D9D9"/>
+                  <rect x="758.627" y="477" width="2.99353" height="7" fill="#D9D9D9"/>
+                  <rect x="740.666" y="458" width="8.9806" height="2" fill="#D9D9D9"/>
+                  <rect x="740.666" y="470" width="8.9806" height="2" fill="#D9D9D9"/>
+
+                  <rect x="736.9" y="440.2" width="7.1" height="11.5" rx="1.2" fill="#F2F2F2"/>
+                  <rect id="phone-screen" class="device-screen" x="737.55" y="441.1" width="5.8" height="9.2" rx="0.9" fill="#2b3b48"/>
+                  <path id="phone-wifi-1" class="wifi-signal" d="M734.9 439.2C736.5 437.7 738.4 436.9 740.45 436.9C742.5 436.9 744.4 437.7 746 439.2" />
+                  <path id="phone-wifi-2" class="wifi-signal" d="M736.2 437.2C737.3 436.1 738.8 435.5 740.45 435.5C742.1 435.5 743.6 436.1 744.7 437.2" />
+                  <path id="phone-wifi-3" class="wifi-signal" d="M737.7 435.5C738.4 434.8 739.3 434.45 740.45 434.45C741.6 434.45 742.5 434.8 743.2 435.5" />
+
+                  
+
+                  <rect id="light-kitchen-hood" class="house-light" x="776" y="636" width="38" height="4" rx="2" fill="#2b3b48"/>
+
+                  <!-- washer -->
+                  <rect x="958" y="697" width="4" height="75" fill="#D9D9D9"/>
+                  <rect x="1013" y="697" width="4" height="75" fill="#D9D9D9"/>
+                  <path d="M987.5 726C996.669 726 1004 732.994 1004 741.5C1004 750.006 996.669 757 987.5 757C978.331 757 971 750.006 971 741.5C971 732.994 978.331 726 987.5 726Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect id="washer-water" class="washer-water" x="958" y="771" width="59" height="0" clip-path="url(#washerWaterClip)"/>
+                  <circle id="washer-bubble-1" class="washer-bubble" cx="973" cy="706" r="4.5" />
+                  <circle id="washer-bubble-2" class="washer-bubble" cx="987" cy="699" r="5.5" />
+                  <circle id="washer-bubble-3" class="washer-bubble" cx="1001" cy="705" r="4.2" />
+                  <circle id="washer-bubble-4" class="washer-bubble" cx="980" cy="691" r="3.8" />
+                  <path d="M987.5 726C996.669 726 1004 732.994 1004 741.5C1004 750.006 996.669 757 987.5 757C978.331 757 971 750.006 971 741.5C971 732.994 978.331 726 987.5 726Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect x="965" y="697" width="45" height="2" fill="#D9D9D9"/>
+                  <rect x="962" y="711" width="52" height="2" fill="#D9D9D9"/>
+                  <rect x="965" y="703" width="25" height="5" fill="#D9D9D9"/>
+                  <circle cx="995.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
+                  <circle cx="1005.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
+
+                  <!-- kitchen -->
+                  <rect x="742" y="610" width="130" height="2" fill="#D9D9D9"/>
+                  <rect x="742" y="631" width="130" height="2" fill="#D9D9D9"/>
+                  <path d="M742 612H743.453V631H742V612Z" fill="#D9D9D9"/>
+                  <rect x="838.592" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="774.682" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="806.637" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="870.547" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="741" y="689" width="133" height="4" fill="#D9D9D9"/>
+                  <rect x="741" y="694" width="3" height="90" fill="#D9D9D9"/>
+                  <rect x="871" y="694" width="3" height="90" fill="#D9D9D9"/>
+                  <path d="M867.5 696.5V706.5H747.5V696.5H867.5Z" stroke="#D9D9D9"/>
+                  <path d="M867.5 709.5V719.5H747.5V709.5H867.5Z" stroke="#D9D9D9"/>
+                  <rect x="747" y="724" width="32" height="44" fill="#D9D9D9"/>
+                  <rect x="784" y="724" width="32" height="44" fill="#D9D9D9"/>
+                  <path d="M778 686H795V687C795 687.552 794.552 688 794 688H779C778.448 688 778 687.552 778 687V686Z" fill="#D9D9D9"/>
+                  <path d="M798 686H815V687C815 687.552 814.552 688 814 688H799C798.448 688 798 687.552 798 687V686Z" fill="#D9D9D9"/>
+                  <path d="M842 671H848C849.105 671 850 671.895 850 673H843C842.448 673 842 672.552 842 672V671Z" fill="#D9D9D9"/>
+                  <path d="M848 673H850V689H848V673Z" fill="#D9D9D9"/>
+                  <path d="M845 685.5C845 684.672 845.672 684 846.5 684H848V687H846.5C845.672 687 845 686.328 845 685.5Z" fill="#D9D9D9"/>
+                  <path d="M850 684H851.5C852.328 684 853 684.672 853 685.5C853 686.328 852.328 687 851.5 687H850V684Z" fill="#D9D9D9"/>
+                  <path d="M751 675H758C758.552 675 759 675.448 759 676V676.167H752C751.448 676.167 751 675.719 751 675.167V675Z" fill="#D9D9D9"/>
+                  <rect x="753" y="676.167" width="6" height="11.6667" fill="#D9D9D9"/>
+                  <path d="M752 688.833C752 688.281 752.448 687.833 753 687.833H759C759.552 687.833 760 688.281 760 688.833V689H752V688.833Z" fill="#D9D9D9"/>
+                  <path d="M759 677.333H760C760.552 677.333 761 677.781 761 678.333V678.5H759V677.333Z" fill="#D9D9D9"/>
+                  <path d="M760 678.5H761V684.333C760.448 684.333 760 683.886 760 683.333V678.5Z" fill="#D9D9D9"/>
+                  <path d="M775 636H814C814 638.209 812.209 640 810 640H779C776.791 640 775 638.209 775 636Z" fill="#D9D9D9"/>
+                  <rect x="785" y="633" width="20" height="3" fill="#D9D9D9"/>
+
+                  <!-- microwave -->
+                  <rect x="842" y="614" width="26" height="15" rx="1" fill="#645F5F"/>
+                  <rect id="microwave-screen" class="device-screen warm-device" x="844" y="616" width="20" height="11" rx="1" fill="#2b3b48"/>
+
+                  <!-- oven -->
+                  <path d="M823 731.098H861C861.552 731.098 862 731.545 862 732.098V766C862 766.552 861.552 767 861 767H823C822.448 767 822 766.552 822 766V732.098C822 731.545 822.448 731.098 823 731.098Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect x="821" y="724" width="42" height="3" rx="1" fill="#D9D9D9"/>
+                  <rect id="oven-window" class="device-screen warm-device" x="826" y="735" width="32" height="28" rx="1" fill="#2b3b48"/>
+
+                  <!-- dining light -->
+                  <rect x="645" y="501" width="2" height="83" fill="#D9D9D9"/>
+                  <rect x="642.482" y="583.468" width="7.49388" height="5.42553" fill="#D9D9D9"/>
+                  <rect x="631.99" y="588.861" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="636.487" y="599.97" width="19.4841" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="631.99" y="596.941" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="620" y="591.891" width="52.4572" height="5.0495" fill="#D9D9D9"/>
+                  <rect id="light-dining" class="house-light" x="631.99" y="599.97" width="29.9755" height="3.0297" rx="1.5" fill="#2b3b48"/>
+
+                  <!-- living room / tv -->
+                  <rect x="616" y="690" width="59" height="2" fill="#D9D9D9"/>
+                  <rect x="623" y="692" width="2" height="77" fill="#D9D9D9"/>
+                  <rect x="666" y="692" width="2" height="77" fill="#D9D9D9"/>
+                  <path d="M593 715C593 714.448 593.448 714 594 714H611C611.552 714 612 714.448 612 715V717H593V715Z" fill="#D9D9D9"/>
+                  <rect x="596" y="717" width="1" height="52" fill="#D9D9D9"/>
+                  <rect x="608" y="717" width="1" height="52" fill="#D9D9D9"/>
+                  <path d="M595 708H596C596.552 708 597 708.448 597 709V714H595V708Z" fill="#D9D9D9"/>
+                  <rect x="597" y="764" width="11" height="1" fill="#D9D9D9"/>
+                  <path d="M698 715C698 714.448 697.552 714 697 714H680C679.448 714 679 714.448 679 715V717H698V715Z" fill="#D9D9D9"/>
+                  <rect width="1" height="52" transform="matrix(-1 0 0 1 695 717)" fill="#D9D9D9"/>
+                  <rect width="1" height="52" transform="matrix(-1 0 0 1 683 717)" fill="#D9D9D9"/>
+                  <path d="M696 708H695C694.448 708 694 708.448 694 709V714H696V708Z" fill="#D9D9D9"/>
+                  <rect width="11" height="1" transform="matrix(-1 0 0 1 694 764)" fill="#D9D9D9"/>
+
+                  <rect x="277" y="516" width="15" height="26" fill="#D9D9D9"/>
+                  <rect x="292" y="525" width="6" height="6" fill="#D9D9D9"/>
+                  <rect x="545" y="298" width="15" height="26" fill="#D9D9D9"/>
+                  <rect x="560" y="307" width="6" height="6" fill="#D9D9D9"/>
+                  <rect width="15" height="26" transform="matrix(-1 0 0 1 1097 525)" fill="#D9D9D9"/>
+                  <rect width="6" height="6" transform="matrix(-1 0 0 1 1082 534)" fill="#D9D9D9"/>
+                  <rect x="500.5" y="612.5" width="36" height="53" stroke="#D9D9D9"/>
+
+                  <rect id="tv-screen" class="device-screen" x="348" y="708" width="49" height="27" rx="1.5" fill="#2b3b48"/>
+                  <rect x="346" y="707" width="1" height="29" fill="#D9D9D9"/>
+                  <rect x="398" y="707" width="1" height="29" fill="#D9D9D9"/>
+                  <rect x="346" y="706" width="53" height="1" fill="#D9D9D9"/>
+                  <rect x="346" y="736" width="53" height="1" fill="#D9D9D9"/>
+                  <rect x="327" y="743" width="2" height="19" fill="#D9D9D9"/>
+                  <rect x="417" y="743" width="2" height="19" fill="#D9D9D9"/>
+                  <rect x="324" y="741" width="98" height="2" fill="#D9D9D9"/>
+                  <rect x="327" y="762" width="92" height="2" fill="#D9D9D9"/>
+                  <rect x="327" y="764" width="3" height="5" fill="#D9D9D9"/>
+                  <rect x="416" y="764" width="3" height="5" fill="#D9D9D9"/>
+                  <rect x="330" y="744" width="22" height="17" fill="#D9D9D9"/>
+                  <rect x="373" y="744" width="1" height="17" fill="#D9D9D9"/>
+                  <rect x="395" y="744" width="20" height="17" fill="#D9D9D9"/>
+
+                  <!-- pendant lights -->
+                  <rect x="430" y="540" width="10" height="33" fill="#D9D9D9"/>
+                  <rect x="445" y="557" width="10" height="33" fill="#D9D9D9"/>
+                  <rect x="417" y="568" width="10" height="38" fill="#D9D9D9"/>
+                  <rect x="421" y="501" width="1" height="67" fill="#D9D9D9"/>
+                  <rect x="434" y="501" width="1" height="39" fill="#D9D9D9"/>
+                  <rect x="450" y="501" width="1" height="56" fill="#D9D9D9"/>
+                  <rect id="light-living-1" class="house-light" x="430" y="540" width="10" height="33" rx="1" fill="#2b3b48"/>
+                  <rect id="light-living-2" class="house-light" x="445" y="557" width="10" height="33" rx="1" fill="#2b3b48"/>
+                  <rect id="light-living-3" class="house-light" x="417" y="568" width="10" height="38" rx="1" fill="#2b3b48"/>
+
+                  <rect x="455" y="736" width="53" height="30" fill="#D9D9D9"/>
+                  <rect x="497" y="717" width="7" height="19" fill="#D9D9D9"/>
+                  <rect x="458" y="766" width="1" height="4" fill="#D9D9D9"/>
+                  <rect x="504" y="766" width="1" height="4" fill="#D9D9D9"/>
+                  <rect x="531" y="722" width="32" height="3" fill="#D9D9D9"/>
+                  <rect x="546" y="725" width="2" height="44" fill="#D9D9D9"/>
+                  <rect x="539" y="769" width="16" height="2" fill="#D9D9D9"/>
+
+                  <rect id="light-exterior-left" class="house-light" x="277" y="516" width="15" height="26" rx="1" fill="#2b3b48"/>
+                  <rect id="light-exterior-top" class="house-light" x="545" y="298" width="15" height="26" rx="1" fill="#2b3b48"/>
+                  <rect id="light-exterior-right" class="house-light" width="15" height="26" rx="1" transform="matrix(-1 0 0 1 1097 525)" fill="#2b3b48"/>
+                </g>
+              </svg>
+            </div>
+
+            <div class="status-chip chip-br" id="chip-lights">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Generating Light</span>
+            </div>
+
+            <div class="status-chip chip-tl" id="chip-heat">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Producing Heat</span>
+            </div>
+
+            <div class="status-chip chip-tr" id="chip-water">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Obtaining Water</span>
+            </div>
+
+            <div class="status-chip chip-bl" id="chip-ai">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Powering Local AI</span>
+            </div>
+
+            <div id="achievementBanner" class="achievement-banner hidden">
+              <span id="achievementText">DO NOT STOP WORKING</span>
+            </div>
+
+            <div id="inactivityAlert" class="inactivity-alert hidden">
+              <span class="alert-icon">&#9888;</span>
+              <span class="alert-text">INACTIVITY DETECTED. RESETTING IN <span id="alertCountdown">8</span></span>
+              <span class="alert-icon">&#9888;</span>
             </div>
           </div>
         </section>
 
-        <section class="right-panel panel">
-          <div class="global-title">Global Contribution</div>
+        <section class="right-panel">
+          <div class="session-glass">
+            <div class="session-header">Global Stats</div>
+            <div class="session-stats">
+              <div class="stat-item stat-item-right">
+                <div id="statHumans" class="stat-value">0</div>
+                <div class="stat-label">Human Generators</div>
+                <div class="stat-last">Attempts at Using URENERGY</div>
+              </div>
 
-          <div class="global-block">
-            <div class="global-kicker">TOTAL ENERGY HARVESTED</div>
-            <div id="globalEnergy" class="global-number">0</div>
-            <div class="global-sub">Watt . All Contributors</div>
-          </div>
+              <div class="stat-item stat-item-right">
+                <div id="statEnergy" class="stat-value">0.00</div>
+                <div class="stat-label">Energy Harvested</div>
+                <div class="stat-last">2.5 Watts Per Prompt</div>
+              </div>
 
-          <div class="global-block">
-            <div class="global-kicker">TOTAL CONTRIBUTORS</div>
-            <div class="global-number">2,000</div>
-            <div class="global-sub">Human count</div>
-          </div>
+              <div class="stat-item stat-item-right">
+                <div id="statCalories" class="stat-value">0</div>
+                <div class="stat-label">Calories Converted</div>
+                <div class="stat-last">From People Like You</div>
+              </div>
 
-          <div class="global-block">
-            <div class="global-kicker">ACTIVE DATA CENTERS</div>
-            <div class="global-number">10</div>
-            <div class="global-sub">Supplied by UREnergy</div>
-          </div>
-
-          <div class="global-block">
-            <div class="global-kicker">TOTAL AI PROMPTS GENERATED</div>
-            <div id="globalPrompts" class="global-number">0</div>
-            <div class="global-sub">Number of Prompts</div>
+              <div class="stat-item stat-item-right prompts-stat-item">
+                <div class="prompts-today-wrap">
+                  <div id="statPromptsToday" class="stat-value prompts-today-value">—</div>
+                  <span id="promptsIncrement" class="prompts-increment" aria-hidden="true">+28,935</span>
+                </div>
+                <div class="stat-label">AI Prompts Today</div>
+                <div class="stat-last">28,935 Prompts Per Second</div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
-
-      <footer class="footer-note">
-        THANK YOU FOR YOUR CONTRIBUTION TO AI GENERATION
-      </footer>
 
       <video id="cameraFeed" class="hidden-capture" autoplay playsinline muted></video>
       <canvas id="motionCanvas" class="hidden-capture"></canvas>

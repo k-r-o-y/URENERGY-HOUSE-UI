@@ -1,0 +1,8 @@
+{
+  "name": "urenergy-house-ui",
+  "version": "1.0.0",
+  "description": "U(R)Energy House UI",
+  "dependencies": {
+    "three": "0.128.0"
+  }
+}
