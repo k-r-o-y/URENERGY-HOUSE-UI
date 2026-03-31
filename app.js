@@ -568,7 +568,7 @@ setInterval(() => {
 /* -------------------- INACTIVITY / DECAY -------------------- */
 
 const ALERT_MS = 3000;
-const RESET_MS = 14000;
+const RESET_MS = 8000;
 const DEPLETE = 0.025;
 
 let hasSpun = false;
