@@ -1020,3 +1020,27 @@ body {
   }
 }
 
+.top-left-logo {
+  position: absolute;
+  top: 28px;
+  left: 60px; /* moved right */
+  z-index: 1000;
+}
+
+.top-left-logo img {
+  width: 200px;   /* increase size */
+  height: auto;
+  opacity: 0.9;
+
+  filter:
+    drop-shadow(0 0 10px rgba(255, 120, 40, 0.35))
+    drop-shadow(0 0 24px rgba(255, 80, 20, 0.2));
+
+  transition: all 0.3s ease;
+}
+
+.top-left-logo img:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
