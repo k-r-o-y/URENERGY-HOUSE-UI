@@ -5,40 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>U(R)Energy v3</title>
     <link rel="stylesheet" href="./styles.css" />
-    <script src="./node_modules/three/build/three.min.js"></script>
-    <script src="./node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="./glb-data.js"></script>
-    <script>console.info("INDEX_HTML_VERSION_V3", window.location.href);</script>
   </head>
   <body>
     <div class="app-shell">
-
-      <!-- Corner icon buttons -->
       <div class="corner-icons">
-        <button id="startCameraBtn" class="icon-btn" aria-label="Start Camera" style="display:none"></button>
+        <button id="startCameraBtn" class="icon-btn" aria-label="Start Camera" style="display: none"></button>
+
         <button id="connectCrankBtn" class="icon-btn" aria-label="Connect Crank" title="Connect Crank">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v4M8 2v4M16 2v4"/>
-            <rect x="7" y="6" width="10" height="7" rx="2"/>
-            <path d="M12 13v9"/>
+            <path d="M12 2v4M8 2v4M16 2v4"></path>
+            <rect x="7" y="6" width="10" height="7" rx="2"></rect>
+            <path d="M12 13v9"></path>
           </svg>
         </button>
+
+        <button id="testFillBtn" class="icon-btn" aria-label="Test Fill" title="Test Fill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"></path>
+            <path d="M13 6l6 6-6 6"></path>
+          </svg>
+        </button>
+
         <button id="fullscreenBtn" class="icon-btn" aria-label="Enter Fullscreen" title="Enter Fullscreen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"></path>
           </svg>
         </button>
+
         <button id="resetBtn" class="icon-btn" aria-label="Reset Session" title="Reset Session">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10"/>
-            <path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.51"></path>
           </svg>
         </button>
       </div>
 
       <main class="dashboard">
-
-        <!-- LEFT: This Session -->
         <section class="left-panel">
           <div class="session-glass">
             <div class="session-header">This Session</div>
@@ -48,16 +50,19 @@
                 <div class="stat-label">Rotations</div>
                 <div class="stat-last">Record: <span id="recordRotations">—</span></div>
               </div>
+
               <div class="stat-item">
-                <div id="wattValue" class="stat-value">0.00</div>
+                <div id="wattValue" class="stat-value">0.0</div>
                 <div class="stat-label">Watts Produced</div>
                 <div class="stat-last">Record: <span id="recordWatts">—</span></div>
               </div>
+
               <div class="stat-item">
                 <div id="kcalValue" class="stat-value">0</div>
                 <div class="stat-label">Calories Burned</div>
                 <div class="stat-last">Record: <span id="recordKcal">—</span></div>
               </div>
+
               <div class="stat-item">
                 <div id="promptValue" class="stat-value">0</div>
                 <div class="stat-label">AI Prompts Powered</div>
@@ -67,172 +72,328 @@
           </div>
         </section>
 
-        <!-- CENTER: Gauge + House -->
         <section class="center-panel">
-          <!-- Logo -->
-          <div class="logo-badge">
-            <img src="./LogoWhite.svg" alt="UREnergy Logo" class="logo-img"/>
-          </div>
-
           <div class="house-gauge-wrapper">
+            <div class="meter-logo-badge" id="meterLogoBadge">
+              <img src="./LogoWhite.svg" alt="UREnergy Logo" class="meter-logo-img" />
+            </div>
 
-            <!-- Gauge SVG ring (sits behind house) -->
             <svg class="gauge-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" id="gaugeSvg">
               <defs>
                 <filter id="gaugeGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
-                  <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur1"/>
-                  <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur2"/>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur1"></feGaussianBlur>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur2"></feGaussianBlur>
                   <feMerge>
-                    <feMergeNode in="blur1"/>
-                    <feMergeNode in="blur2"/>
-                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="blur1"></feMergeNode>
+                    <feMergeNode in="blur2"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
                   </feMerge>
                 </filter>
+
                 <filter id="gaugeOuterGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
-                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
                   <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="blur"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
                   </feMerge>
                 </filter>
               </defs>
-              <!-- Track arc -->
-              <circle class="gauge-track" cx="50" cy="50" r="45"/>
-              <!-- Outer glow arc -->
-              <circle class="gauge-outer-glow" id="gaugeOuterGlow" cx="50" cy="50" r="45"/>
-              <!-- Core fill arc -->
-              <circle class="gauge-fill" id="gaugeFill" cx="50" cy="50" r="45"/>
-              <!-- End cap dot -->
-              <circle class="gauge-cap-dot" id="gaugeCapDot" cx="50" cy="5" r="1.8"/>
+
+              <path class="gauge-track" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <path class="gauge-outer-glow" id="gaugeOuterGlow" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <path class="gauge-fill" id="gaugeFill" d="M 26 88 A 45.5 45.5 0 1 1 74 88" pathLength="100"></path>
+              <circle class="gauge-cap-dot" id="gaugeCapDot" cx="26" cy="88" r="2.2"></circle>
             </svg>
 
-            <!-- 3-D model viewer (Three.js populates this when WebGL available) -->
-            <div id="glbContainer" class="glb-container"></div>
+            <div class="house-float-wrapper" id="houseFallback" aria-hidden="true">
+              <svg
+                id="houseSvg"
+                class="house-single-svg"
+                width="1280"
+                height="832"
+                viewBox="0 0 1280 832"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <clipPath id="clip0_152_30">
+                    <rect width="1280" height="832" fill="white" />
+                  </clipPath>
+                  <clipPath id="washerWaterClip">
+                    <circle cx="987.5" cy="741.5" r="29.5" />
+                  </clipPath>
+                </defs>
 
-            <!-- House illustration fallback (shown when 3D model unavailable) -->
-            <div class="house-float-wrapper" id="houseFallback">
-              <svg class="house-svg" viewBox="0 0 820 560">
-                <g transform="translate(-36, 18) scale(0.94)">
-                  <!-- chimney smoke -->
-                  <g id="chimneySmoke" class="smoke-group">
-                    <circle class="smoke puff-1" cx="556" cy="36" r="11"></circle>
-                    <circle class="smoke puff-2" cx="566" cy="18" r="15"></circle>
-                    <circle class="smoke puff-3" cx="578" cy="-4" r="18"></circle>
-                  </g>
-                  <!-- roof -->
-                  <polygon points="200,126 620,126 592,82 228,82" class="roof-top"/>
-                  <rect x="530" y="40" width="34" height="58" class="chimney"/>
-                  <rect x="525" y="30" width="44" height="14" class="chimney-cap"/>
-                  <!-- roof tile lines -->
-                  <line x1="244" y1="96" x2="576" y2="96" class="roof-tile-line"/>
-                  <line x1="236" y1="108" x2="590" y2="108" class="roof-tile-line"/>
-                  <line x1="224" y1="120" x2="602" y2="120" class="roof-tile-line"/>
-                  <line x1="270" y1="88" x2="252" y2="126" class="roof-tile-seam"/>
-                  <line x1="320" y1="88" x2="304" y2="126" class="roof-tile-seam"/>
-                  <line x1="370" y1="88" x2="356" y2="126" class="roof-tile-seam"/>
-                  <line x1="420" y1="88" x2="408" y2="126" class="roof-tile-seam"/>
-                  <line x1="470" y1="88" x2="460" y2="126" class="roof-tile-seam"/>
-                  <line x1="520" y1="88" x2="512" y2="126" class="roof-tile-seam"/>
-                  <!-- outer structure -->
-                  <rect x="205" y="120" width="410" height="330" class="house-shell"/>
-                  <rect x="205" y="270" width="410" height="18" class="floor-divider"/>
-                  <rect x="205" y="120" width="18" height="330" class="frame"/>
-                  <rect x="597" y="120" width="18" height="330" class="frame"/>
-                  <rect x="205" y="432" width="410" height="18" class="frame"/>
-                  <!-- outer wall faces -->
-                  <rect x="223" y="126" width="374" height="12" class="outer-wall"/>
-                  <rect x="223" y="138" width="12" height="294" class="outer-wall"/>
-                  <rect x="585" y="138" width="12" height="294" class="outer-wall"/>
-                  <rect x="223" y="420" width="374" height="12" class="outer-wall"/>
-                  <!-- upper rooms -->
-                  <rect x="223" y="138" width="180" height="132" class="room room-bedroom"/>
-                  <rect x="421" y="138" width="176" height="132" class="room room-bath"/>
-                  <!-- lower rooms -->
-                  <rect x="223" y="288" width="260" height="144" class="room room-kitchen"/>
-                  <rect x="501" y="288" width="96" height="144" class="room room-utility"/>
-                  <!-- upper left bedroom -->
-                  <rect x="254" y="226" width="88" height="18" class="bed-base"/>
-                  <rect x="246" y="212" width="28" height="20" class="pillow"/>
-                  <rect x="336" y="202" width="30" height="42" class="utility-shape off heat-shape"/>
-                  <circle cx="319" cy="160" r="7" class="utility-shape off light-shape"/>
-                  <path d="M319 160 L319 194" class="fixture-line"/>
-                  <polygon points="292,194 346,194 330,208 308,208" class="lamp-shade"/>
-                  <!-- upper middle boiler -->
-                  <rect x="386" y="164" width="34" height="62" class="utility-shape off power-shape" rx="5"/>
-                  <circle cx="403" cy="192" r="8" class="boiler-dial"/>
-                  <line x1="396" y1="226" x2="396" y2="270" class="pipe"/>
-                  <line x1="410" y1="226" x2="410" y2="270" class="pipe"/>
-                  <!-- upper right bathroom -->
-                  <rect x="472" y="198" width="56" height="20" class="bathtub" rx="6"/>
-                  <rect x="541" y="218" width="26" height="22" class="toilet" rx="4"/>
-                  <rect x="500" y="182" width="42" height="10" class="sink" rx="4"/>
-                  <circle cx="506" cy="160" r="7" class="utility-shape off light-shape"/>
-                  <path d="M506 160 L506 192" class="fixture-line"/>
-                  <polygon points="478,192 534,192 520,205 492,205" class="lamp-shade"/>
-                  <!-- lower kitchen -->
-                  <rect x="250" y="374" width="48" height="40" class="cabinet"/>
-                  <rect x="303" y="374" width="58" height="40" class="cabinet"/>
-                  <rect x="366" y="374" width="52" height="40" class="cabinet"/>
-                  <rect x="285" y="340" width="106" height="16" class="countertop"/>
-                  <rect x="318" y="350" width="28" height="18" class="sink-basin"/>
-                  <rect x="404" y="360" width="34" height="54" class="appliance"/>
-                  <circle cx="421" cy="387" r="10" class="washer-door"/>
-                  <circle cx="338" cy="322" r="7" class="utility-shape off light-shape"/>
-                  <path d="M338 322 L338 352" class="fixture-line"/>
-                  <polygon points="310,352 366,352 350,364 326,364" class="lamp-shade"/>
-                  <!-- water / utility room -->
-                  <rect x="545" y="338" width="34" height="66" class="utility-shape off water-shape" rx="6"/>
-                  <rect x="520" y="392" width="28" height="22" class="utility-shape off power-shape" rx="4"/>
-                  <line x1="560" y1="404" x2="560" y2="432" class="pipe"/>
-                  <line x1="548" y1="404" x2="548" y2="432" class="pipe"/>
-                  <rect x="512" y="324" width="72" height="8" class="utility-shelf"/>
-                  <!-- front door -->
-                  <rect x="228" y="324" width="62" height="96" class="front-door-arch" rx="28"/>
-                  <rect x="238" y="336" width="42" height="74" class="front-door" rx="18"/>
-                  <rect x="250" y="352" width="12" height="38" class="door-window"/>
-                  <rect x="266" y="352" width="12" height="38" class="door-window"/>
+                <g clip-path="url(#clip0_152_30)">
+                  <rect x="153" y="772" width="960" height="16" fill="#D9D9D9"/>
+                  <rect x="243" y="486" width="842" height="15" fill="#D9D9D9"/>
+                  <rect x="566" y="284" width="10" height="501" fill="#D9D9D9"/>
+                  <rect x="1054" y="351" width="22" height="421" fill="#D9D9D9"/>
+                  <rect x="298" y="497" width="10" height="275" fill="#D9D9D9"/>
+                  <rect x="481.114" y="260.846" width="611.811" height="15.7242" transform="rotate(8 481.114 260.846)" fill="#D9D9D9"/>
+                  <rect x="383" y="410" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="383" y="448" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="383" y="429" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="373" y="401" width="10" height="85" fill="#D9D9D9"/>
+                  <rect x="383" y="467" width="183" height="5" fill="#D9D9D9"/>
+                  <rect x="904" y="500" width="9" height="271" fill="#D9D9D9"/>
+                  <rect x="586.5" y="408.5" width="134.707" height="27" stroke="#D9D9D9"/>
+                  <rect x="586.5" y="448.5" width="134.707" height="27" stroke="#D9D9D9"/>
+                  <rect x="586" y="476" width="4.98922" height="8" fill="#D9D9D9"/>
+                  <rect x="716.718" y="476" width="4.98922" height="8" fill="#D9D9D9"/>
+                  <rect x="591" y="437" width="126" height="17" rx="2" fill="#D9D9D9"/>
+                  <path d="M697.962 427.011C698.969 427.113 699.754 427.964 699.754 429V438C699.754 439.105 698.861 440 697.759 440H674.808C673.706 440 672.812 439.105 672.812 438V429L672.823 428.796C672.925 427.787 673.775 427 674.808 427H697.759L697.962 427.011Z" fill="#928D8D"/>
+                  <rect x="586" y="436" width="3.99138" height="12" fill="#D9D9D9"/>
+                  <rect x="717.716" y="436" width="3.99138" height="12" fill="#D9D9D9"/>
+                  <path d="M634.1 427.011C635.107 427.113 635.892 427.964 635.892 429V438C635.892 439.105 634.999 440 633.897 440H610.946C609.844 440 608.95 439.105 608.95 438V429L608.961 428.796C609.063 427.787 609.913 427 610.946 427H633.897L634.1 427.011Z" fill="#928D8D"/>
+                  <rect x="608.95" y="431" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="608.95" y="429" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="672.812" y="431" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="672.812" y="429" width="26.9418" height="1" fill="#D9D9D9"/>
+                  <rect x="999" y="359" width="2" height="127" fill="#D9D9D9"/>
+                  <path d="M1042 359H1044V486H1042V359Z" fill="#D9D9D9"/>
+
+                  <rect x="1003.25" y="376.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="359.5" width="36.6061" height="14" stroke="#D9D9D9"/>
+                  <rect x="1003.5" y="464.5" width="36" height="16" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="398.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="420.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+                  <rect x="1003.25" y="442.5" width="36.6061" height="19" stroke="#D9D9D9"/>
+
+                  <rect x="663.832" y="369" width="178.614" height="2" fill="#D9D9D9"/>
+                  <rect x="663.832" y="390" width="178.614" height="2" fill="#D9D9D9"/>
+                  <path d="M663.832 371H665.827V390H663.832V371Z" fill="#D9D9D9"/>
+                  <rect x="796.545" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="708.735" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="752.64" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+                  <rect x="840.45" y="371" width="1.99569" height="19" fill="#D9D9D9"/>
+
+                  <rect x="652.855" y="301" width="0.997845" height="39.2" fill="#D9D9D9"/>
+                  <path d="M640.881 348H665.827C665.827 348.552 665.38 349 664.827 349H641.881C641.329 349 640.881 348.552 640.881 348Z" fill="#D9D9D9"/>
+                  <path d="M640.881 348C640.881 346.343 642.224 345 643.881 345H662.827C664.484 345 665.827 346.343 665.827 348H640.881Z" fill="#D9D9D9"/>
+                  <rect x="651.858" y="340.2" width="2.99353" height="5.44444" fill="#D9D9D9"/>
+                  <rect id="light-bedroom" class="house-light" x="640.881" y="348" width="24.946" height="1.5" rx="0.75" fill="#2b3b48"/>
+
+<!-- mirror -->
+<rect x="901.819" y="374.5" width="28.9353" height="41" rx="0.5" stroke="#D9D9D9"/>
+
+<!-- faint mirror panel fill -->
+<rect
+  id="mirror-panel"
+  class="mirror-panel"
+  x="903.1"
+  y="375.8"
+  width="26.3"
+  height="38.4"
+  rx="0.4"
+  fill="#1a2730"
+/>
+
+<circle id="mirror-dot" class="mirror-dot" cx="916" cy="412" r="1.65" fill="#1a2730"/>
+
+<!-- mirror signal: like phone wifi, slightly bigger, sideways -->
+<path
+  id="mirror-signal-left-1"
+  class="mirror-signal"
+  d="M913.9 410.9C912.7 410.0 911.8 409.0 911.1 407.7"
+/>
+
+<path
+  id="mirror-signal-left-2"
+  class="mirror-signal"
+  d="M914.7 412.5C912.9 411.4 911.5 410.0 910.4 408.0"
+/>
+
+<path
+  id="mirror-signal-right-1"
+  class="mirror-signal"
+  d="M918.1 410.9C919.3 410.0 920.2 409.0 920.9 407.7"
+/>
+
+<path
+  id="mirror-signal-right-2"
+  class="mirror-signal"
+  d="M917.3 412.5C919.1 411.4 920.5 410.0 921.6 408.0"
+/>
+
+                  <!-- phone -->
+                  <rect x="727.694" y="450" width="35.9224" height="3" fill="#D9D9D9"/>
+                  <rect x="729.689" y="454" width="31.931" height="11" fill="#D9D9D9"/>
+                  <rect x="729.689" y="466" width="31.931" height="11" fill="#D9D9D9"/>
+                  <rect x="729.689" y="477" width="2.99353" height="7" fill="#D9D9D9"/>
+                  <rect x="758.627" y="477" width="2.99353" height="7" fill="#D9D9D9"/>
+                  <rect x="740.666" y="458" width="8.9806" height="2" fill="#D9D9D9"/>
+                  <rect x="740.666" y="470" width="8.9806" height="2" fill="#D9D9D9"/>
+
+                  <rect x="736.9" y="440.2" width="7.1" height="11.5" rx="1.2" fill="#F2F2F2"/>
+                  <rect id="phone-screen" class="device-screen" x="737.55" y="441.1" width="5.8" height="9.2" rx="0.9" fill="#2b3b48"/>
+                  <path id="phone-wifi-1" class="wifi-signal" d="M734.9 439.2C736.5 437.7 738.4 436.9 740.45 436.9C742.5 436.9 744.4 437.7 746 439.2" />
+                  <path id="phone-wifi-2" class="wifi-signal" d="M736.2 437.2C737.3 436.1 738.8 435.5 740.45 435.5C742.1 435.5 743.6 436.1 744.7 437.2" />
+                  <path id="phone-wifi-3" class="wifi-signal" d="M737.7 435.5C738.4 434.8 739.3 434.45 740.45 434.45C741.6 434.45 742.5 434.8 743.2 435.5" />
+
+                  
+
+                  <rect id="light-kitchen-hood" class="house-light" x="776" y="636" width="38" height="4" rx="2" fill="#2b3b48"/>
+
+                  <!-- washer -->
+                  <rect x="958" y="697" width="4" height="75" fill="#D9D9D9"/>
+                  <rect x="1013" y="697" width="4" height="75" fill="#D9D9D9"/>
+                  <path d="M987.5 726C996.669 726 1004 732.994 1004 741.5C1004 750.006 996.669 757 987.5 757C978.331 757 971 750.006 971 741.5C971 732.994 978.331 726 987.5 726Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect id="washer-water" class="washer-water" x="958" y="771" width="59" height="0" clip-path="url(#washerWaterClip)"/>
+                  <circle id="washer-bubble-1" class="washer-bubble" cx="973" cy="706" r="4.5" />
+                  <circle id="washer-bubble-2" class="washer-bubble" cx="987" cy="699" r="5.5" />
+                  <circle id="washer-bubble-3" class="washer-bubble" cx="1001" cy="705" r="4.2" />
+                  <circle id="washer-bubble-4" class="washer-bubble" cx="980" cy="691" r="3.8" />
+                  <path d="M987.5 726C996.669 726 1004 732.994 1004 741.5C1004 750.006 996.669 757 987.5 757C978.331 757 971 750.006 971 741.5C971 732.994 978.331 726 987.5 726Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect x="965" y="697" width="45" height="2" fill="#D9D9D9"/>
+                  <rect x="962" y="711" width="52" height="2" fill="#D9D9D9"/>
+                  <rect x="965" y="703" width="25" height="5" fill="#D9D9D9"/>
+                  <circle cx="995.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
+                  <circle cx="1005.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
+
+                  <!-- kitchen -->
+                  <rect x="742" y="610" width="130" height="2" fill="#D9D9D9"/>
+                  <rect x="742" y="631" width="130" height="2" fill="#D9D9D9"/>
+                  <path d="M742 612H743.453V631H742V612Z" fill="#D9D9D9"/>
+                  <rect x="838.592" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="774.682" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="806.637" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="870.547" y="612" width="1.45251" height="19" fill="#D9D9D9"/>
+                  <rect x="741" y="689" width="133" height="4" fill="#D9D9D9"/>
+                  <rect x="741" y="694" width="3" height="90" fill="#D9D9D9"/>
+                  <rect x="871" y="694" width="3" height="90" fill="#D9D9D9"/>
+                  <path d="M867.5 696.5V706.5H747.5V696.5H867.5Z" stroke="#D9D9D9"/>
+                  <path d="M867.5 709.5V719.5H747.5V709.5H867.5Z" stroke="#D9D9D9"/>
+                  <rect x="747" y="724" width="32" height="44" fill="#D9D9D9"/>
+                  <rect x="784" y="724" width="32" height="44" fill="#D9D9D9"/>
+                  <path d="M778 686H795V687C795 687.552 794.552 688 794 688H779C778.448 688 778 687.552 778 687V686Z" fill="#D9D9D9"/>
+                  <path d="M798 686H815V687C815 687.552 814.552 688 814 688H799C798.448 688 798 687.552 798 687V686Z" fill="#D9D9D9"/>
+                  <path d="M842 671H848C849.105 671 850 671.895 850 673H843C842.448 673 842 672.552 842 672V671Z" fill="#D9D9D9"/>
+                  <path d="M848 673H850V689H848V673Z" fill="#D9D9D9"/>
+                  <path d="M845 685.5C845 684.672 845.672 684 846.5 684H848V687H846.5C845.672 687 845 686.328 845 685.5Z" fill="#D9D9D9"/>
+                  <path d="M850 684H851.5C852.328 684 853 684.672 853 685.5C853 686.328 852.328 687 851.5 687H850V684Z" fill="#D9D9D9"/>
+                  <path d="M751 675H758C758.552 675 759 675.448 759 676V676.167H752C751.448 676.167 751 675.719 751 675.167V675Z" fill="#D9D9D9"/>
+                  <rect x="753" y="676.167" width="6" height="11.6667" fill="#D9D9D9"/>
+                  <path d="M752 688.833C752 688.281 752.448 687.833 753 687.833H759C759.552 687.833 760 688.281 760 688.833V689H752V688.833Z" fill="#D9D9D9"/>
+                  <path d="M759 677.333H760C760.552 677.333 761 677.781 761 678.333V678.5H759V677.333Z" fill="#D9D9D9"/>
+                  <path d="M760 678.5H761V684.333C760.448 684.333 760 683.886 760 683.333V678.5Z" fill="#D9D9D9"/>
+                  <path d="M775 636H814C814 638.209 812.209 640 810 640H779C776.791 640 775 638.209 775 636Z" fill="#D9D9D9"/>
+                  <rect x="785" y="633" width="20" height="3" fill="#D9D9D9"/>
+
+                  <!-- microwave -->
+                  <rect x="842" y="614" width="26" height="15" rx="1" fill="#645F5F"/>
+                  <rect id="microwave-screen" class="device-screen warm-device" x="844" y="616" width="20" height="11" rx="1" fill="#2b3b48"/>
+
+                  <!-- oven -->
+                  <path d="M823 731.098H861C861.552 731.098 862 731.545 862 732.098V766C862 766.552 861.552 767 861 767H823C822.448 767 822 766.552 822 766V732.098C822 731.545 822.448 731.098 823 731.098Z" stroke="#D9D9D9" stroke-width="2"/>
+                  <rect x="821" y="724" width="42" height="3" rx="1" fill="#D9D9D9"/>
+                  <rect id="oven-window" class="device-screen warm-device" x="826" y="735" width="32" height="28" rx="1" fill="#2b3b48"/>
+
+                  <!-- dining light -->
+                  <rect x="645" y="501" width="2" height="83" fill="#D9D9D9"/>
+                  <rect x="642.482" y="583.468" width="7.49388" height="5.42553" fill="#D9D9D9"/>
+                  <rect x="631.99" y="588.861" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="636.487" y="599.97" width="19.4841" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="631.99" y="596.941" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+                  <rect x="620" y="591.891" width="52.4572" height="5.0495" fill="#D9D9D9"/>
+                  <rect id="light-dining" class="house-light" x="631.99" y="599.97" width="29.9755" height="3.0297" rx="1.5" fill="#2b3b48"/>
+
+                  <!-- living room / tv -->
+                  <rect x="616" y="690" width="59" height="2" fill="#D9D9D9"/>
+                  <rect x="623" y="692" width="2" height="77" fill="#D9D9D9"/>
+                  <rect x="666" y="692" width="2" height="77" fill="#D9D9D9"/>
+                  <path d="M593 715C593 714.448 593.448 714 594 714H611C611.552 714 612 714.448 612 715V717H593V715Z" fill="#D9D9D9"/>
+                  <rect x="596" y="717" width="1" height="52" fill="#D9D9D9"/>
+                  <rect x="608" y="717" width="1" height="52" fill="#D9D9D9"/>
+                  <path d="M595 708H596C596.552 708 597 708.448 597 709V714H595V708Z" fill="#D9D9D9"/>
+                  <rect x="597" y="764" width="11" height="1" fill="#D9D9D9"/>
+                  <path d="M698 715C698 714.448 697.552 714 697 714H680C679.448 714 679 714.448 679 715V717H698V715Z" fill="#D9D9D9"/>
+                  <rect width="1" height="52" transform="matrix(-1 0 0 1 695 717)" fill="#D9D9D9"/>
+                  <rect width="1" height="52" transform="matrix(-1 0 0 1 683 717)" fill="#D9D9D9"/>
+                  <path d="M696 708H695C694.448 708 694 708.448 694 709V714H696V708Z" fill="#D9D9D9"/>
+                  <rect width="11" height="1" transform="matrix(-1 0 0 1 694 764)" fill="#D9D9D9"/>
+
+                  <rect x="277" y="516" width="15" height="26" fill="#D9D9D9"/>
+                  <rect x="292" y="525" width="6" height="6" fill="#D9D9D9"/>
+                  <rect x="545" y="298" width="15" height="26" fill="#D9D9D9"/>
+                  <rect x="560" y="307" width="6" height="6" fill="#D9D9D9"/>
+                  <rect width="15" height="26" transform="matrix(-1 0 0 1 1097 525)" fill="#D9D9D9"/>
+                  <rect width="6" height="6" transform="matrix(-1 0 0 1 1082 534)" fill="#D9D9D9"/>
+                  <rect x="500.5" y="612.5" width="36" height="53" stroke="#D9D9D9"/>
+
+                  <rect id="tv-screen" class="device-screen" x="348" y="708" width="49" height="27" rx="1.5" fill="#2b3b48"/>
+                  <rect x="346" y="707" width="1" height="29" fill="#D9D9D9"/>
+                  <rect x="398" y="707" width="1" height="29" fill="#D9D9D9"/>
+                  <rect x="346" y="706" width="53" height="1" fill="#D9D9D9"/>
+                  <rect x="346" y="736" width="53" height="1" fill="#D9D9D9"/>
+                  <rect x="327" y="743" width="2" height="19" fill="#D9D9D9"/>
+                  <rect x="417" y="743" width="2" height="19" fill="#D9D9D9"/>
+                  <rect x="324" y="741" width="98" height="2" fill="#D9D9D9"/>
+                  <rect x="327" y="762" width="92" height="2" fill="#D9D9D9"/>
+                  <rect x="327" y="764" width="3" height="5" fill="#D9D9D9"/>
+                  <rect x="416" y="764" width="3" height="5" fill="#D9D9D9"/>
+                  <rect x="330" y="744" width="22" height="17" fill="#D9D9D9"/>
+                  <rect x="373" y="744" width="1" height="17" fill="#D9D9D9"/>
+                  <rect x="395" y="744" width="20" height="17" fill="#D9D9D9"/>
+
+                  <!-- pendant lights -->
+                  <rect x="430" y="540" width="10" height="33" fill="#D9D9D9"/>
+                  <rect x="445" y="557" width="10" height="33" fill="#D9D9D9"/>
+                  <rect x="417" y="568" width="10" height="38" fill="#D9D9D9"/>
+                  <rect x="421" y="501" width="1" height="67" fill="#D9D9D9"/>
+                  <rect x="434" y="501" width="1" height="39" fill="#D9D9D9"/>
+                  <rect x="450" y="501" width="1" height="56" fill="#D9D9D9"/>
+                  <rect id="light-living-1" class="house-light" x="430" y="540" width="10" height="33" rx="1" fill="#2b3b48"/>
+                  <rect id="light-living-2" class="house-light" x="445" y="557" width="10" height="33" rx="1" fill="#2b3b48"/>
+                  <rect id="light-living-3" class="house-light" x="417" y="568" width="10" height="38" rx="1" fill="#2b3b48"/>
+
+                  <rect x="455" y="736" width="53" height="30" fill="#D9D9D9"/>
+                  <rect x="497" y="717" width="7" height="19" fill="#D9D9D9"/>
+                  <rect x="458" y="766" width="1" height="4" fill="#D9D9D9"/>
+                  <rect x="504" y="766" width="1" height="4" fill="#D9D9D9"/>
+                  <rect x="531" y="722" width="32" height="3" fill="#D9D9D9"/>
+                  <rect x="546" y="725" width="2" height="44" fill="#D9D9D9"/>
+                  <rect x="539" y="769" width="16" height="2" fill="#D9D9D9"/>
+
+                  <rect id="light-exterior-left" class="house-light" x="277" y="516" width="15" height="26" rx="1" fill="#2b3b48"/>
+                  <rect id="light-exterior-top" class="house-light" x="545" y="298" width="15" height="26" rx="1" fill="#2b3b48"/>
+                  <rect id="light-exterior-right" class="house-light" width="15" height="26" rx="1" transform="matrix(-1 0 0 1 1097 525)" fill="#2b3b48"/>
                 </g>
               </svg>
             </div>
 
-            <!-- Status chips (absolute, scattered around model) -->
-            <div class="status-chip chip-bl" id="chip-datacenter">
-              <span class="chip-dot"></span>
-              <span class="chip-label">Feeding Data Centers</span>
-            </div>
-            <div class="status-chip chip-tl" id="chip-ai">
-              <span class="chip-dot"></span>
-              <span class="chip-label">Powering Local AI</span>
-            </div>
-            <div class="status-chip chip-tr" id="chip-water">
-              <span class="chip-dot"></span>
-              <span class="chip-label">Obtaining Water</span>
-            </div>
-            <div class="status-chip chip-r" id="chip-heat">
-              <span class="chip-dot"></span>
-              <span class="chip-label">Producing Heat</span>
-            </div>
             <div class="status-chip chip-br" id="chip-lights">
               <span class="chip-dot"></span>
               <span class="chip-label">Generating Light</span>
             </div>
 
-            <!-- Achievement banner (shows when sesRot >= spinsToComplete) -->
+            <div class="status-chip chip-tl" id="chip-heat">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Producing Heat</span>
+            </div>
+
+            <div class="status-chip chip-tr" id="chip-water">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Obtaining Water</span>
+            </div>
+
+            <div class="status-chip chip-bl" id="chip-ai">
+              <span class="chip-dot"></span>
+              <span class="chip-label">Powering Local AI</span>
+            </div>
+
             <div id="achievementBanner" class="achievement-banner hidden">
               <span id="achievementText">DO NOT STOP WORKING</span>
             </div>
 
-            <!-- Inactivity alert (countdown) -->
             <div id="inactivityAlert" class="inactivity-alert hidden">
               <span class="alert-icon">&#9888;</span>
               <span class="alert-text">INACTIVITY DETECTED. RESETTING IN <span id="alertCountdown">8</span></span>
               <span class="alert-icon">&#9888;</span>
             </div>
           </div>
-
         </section>
 
-        <!-- RIGHT: Global Contribution -->
         <section class="right-panel">
           <div class="session-glass">
             <div class="session-header">Global Stats</div>
@@ -242,17 +403,20 @@
                 <div class="stat-label">Human Generators</div>
                 <div class="stat-last">Attempts at Using URENERGY</div>
               </div>
+
               <div class="stat-item stat-item-right">
-                <div id="statEnergy" class="stat-value">0.00K</div>
+                <div id="statEnergy" class="stat-value">0.00</div>
                 <div class="stat-label">Energy Harvested</div>
                 <div class="stat-last">2.5 Watts Per Prompt</div>
               </div>
+
               <div class="stat-item stat-item-right">
                 <div id="statCalories" class="stat-value">0</div>
                 <div class="stat-label">Calories Converted</div>
                 <div class="stat-last">From People Like You</div>
               </div>
-              <div class="stat-item stat-item-right">
+
+              <div class="stat-item stat-item-right prompts-stat-item">
                 <div class="prompts-today-wrap">
                   <div id="statPromptsToday" class="stat-value prompts-today-value">—</div>
                   <span id="promptsIncrement" class="prompts-increment" aria-hidden="true">+28,935</span>
@@ -267,774 +431,8 @@
 
       <video id="cameraFeed" class="hidden-capture" autoplay playsinline muted></video>
       <canvas id="motionCanvas" class="hidden-capture"></canvas>
-      <script>
-// ─── State ─────────────────────────────────────────────────────────────────
-const state = {
-  cameraReady: false, motionScore: 0, energyScore: 0, rotations: 0,
-  kcal: 0, seconds: 0, prompts: 0, totalEnergy: 0, chargeLevel: 0,
-  utilitiesPowered: false, inputMode: "idle",
-};
-const listeners = new Set();
-function getState() { return state; }
-function subscribe(fn) { listeners.add(fn); }
-function setState(patch) { Object.assign(state, patch); listeners.forEach(fn => fn(state)); }
-function resetState(patch = {}) {
-  Object.assign(state, { cameraReady:false, motionScore:0, energyScore:0, rotations:0,
-    kcal:0, seconds:0, prompts:0, totalEnergy:0, chargeLevel:0, utilitiesPowered:false, inputMode:"idle", ...patch });
-  listeners.forEach(fn => fn(state));
-}
 
-// ─── Clamp helper ──────────────────────────────────────────────────────────
-function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
-
-// ─── MotionTracker ─────────────────────────────────────────────────────────
-class MotionTracker {
-  constructor({ video, canvas, onUpdate }) {
-    this.video = video; this.canvas = canvas;
-    this.ctx = canvas.getContext("2d", { willReadFrequently: true });
-    this.onUpdate = onUpdate; this.stream = null; this.running = false;
-    this.prevFrame = null; this.lastTime = 0; this.lastRotationTick = 0;
-    this.startTime = 0; this.kcal = 0; this.rotations = 0; this.prompts = 0;
-    this.totalEnergy = 0; this.chargeLevel = 0; this.rafId = null;
-    this.freezeStartedAt = null; this.freezeDuration = 1800; this.frozen = false;
-    this.displayMotion = 0; this.displayEnergy = 0; this.finalSeconds = 0;
-  }
-  async start() {
-    this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    this.video.srcObject = this.stream;
-    await this.video.play();
-    this.canvas.width = 160; this.canvas.height = 120; this.running = true;
-    this.prevFrame = null; this.lastTime = performance.now(); this.lastRotationTick = 0;
-    this.startTime = performance.now(); this.kcal = 0; this.rotations = 0;
-    this.prompts = 0; this.totalEnergy = 0; this.chargeLevel = 0;
-    this.freezeStartedAt = null; this.frozen = false; this.displayMotion = 0;
-    this.displayEnergy = 0; this.finalSeconds = 0;
-    this.rafId = requestAnimationFrame(this.loop.bind(this));
-  }
-  stop() {
-    this.running = false;
-    if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
-    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
-    this.video.srcObject = null; this.prevFrame = null;
-  }
-  loop(now) {
-    if (!this.running) return;
-    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
-    this.lastTime = now;
-    if (!this.freezeStartedAt) {
-      this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-      const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
-      let diff = 0;
-      if (this.prevFrame) { for (let i = 0; i < frame.length; i += 16) diff += Math.abs(frame[i] - this.prevFrame[i]); }
-      this.prevFrame = new Uint8ClampedArray(frame);
-      const rawMotion = clamp(diff / 40000), rawEnergy = clamp(rawMotion * 1.15);
-      this.displayMotion += (rawMotion - this.displayMotion) * 0.22;
-      this.displayEnergy += (rawEnergy - this.displayEnergy) * 0.22;
-      if (this.displayMotion > 0.12 && now - this.lastRotationTick > 450) { this.rotations += 1; this.lastRotationTick = now; }
-      this.kcal += this.displayMotion * 0.24;
-      this.totalEnergy += this.displayEnergy * 3.8;
-      this.prompts = Math.floor(this.totalEnergy / 6.5);
-      const fillRate = this.displayMotion * 0.18 + Math.pow(this.displayMotion, 1.35) * 0.55;
-      this.chargeLevel = clamp(this.chargeLevel + fillRate * dt);
-      if (this.chargeLevel > 0.9 && this.chargeLevel < 1) this.chargeLevel = clamp(this.chargeLevel + 0.008);
-      if (this.chargeLevel >= 0.995) { this.chargeLevel = 1; this.freezeStartedAt = now; this.finalSeconds = Math.floor((now - this.startTime) / 1000); }
-    } else if (!this.frozen) {
-      const t = clamp((now - this.freezeStartedAt) / this.freezeDuration);
-      const easeOut = 1 - Math.pow(1 - t, 3);
-      this.displayMotion *= 1 - 0.16 * easeOut; this.displayEnergy *= 1 - 0.18 * easeOut;
-      if (t >= 1 || (this.displayMotion < 0.002 && this.displayEnergy < 0.002)) { this.displayMotion = 0; this.displayEnergy = 0; this.frozen = true; }
-    }
-    const seconds = this.freezeStartedAt ? this.finalSeconds : Math.floor((now - this.startTime) / 1000);
-    const utilitiesPowered = this.chargeLevel >= 1;
-    this.onUpdate({ cameraReady:true, motionScore:this.displayMotion, energyScore:utilitiesPowered?1:this.displayEnergy,
-      rotations:this.rotations, kcal:this.kcal, seconds, prompts:this.prompts,
-      totalEnergy:this.totalEnergy, chargeLevel:this.chargeLevel, utilitiesPowered, inputMode:"camera" });
-    this.rafId = requestAnimationFrame(this.loop.bind(this));
-  }
-}
-
-// ─── CrankTracker ──────────────────────────────────────────────────────────
-class CrankTracker {
-  constructor({ onUpdate }) {
-    this.onUpdate = onUpdate; this.port = null; this.reader = null; this.decoder = null;
-    this.running = false; this.startTime = 0; this.lastTime = 0; this.buffer = "";
-    this.totalRotations = 0; this.prevRotations = 0; this.kcal = 0; this.prompts = 0;
-    this.totalEnergy = 0; this.chargeLevel = 0; this.freezeStartedAt = null;
-    this.freezeDuration = 2200; this.frozen = false; this.displayMotion = 0;
-    this.displayEnergy = 0; this.rotationBurst = 0; this.finalSeconds = 0;
-  }
-  async connect() {
-    if (!("serial" in navigator)) throw new Error("Web Serial is not supported in this browser.");
-    this.port = await navigator.serial.requestPort();
-    await this.port.open({ baudRate: 9600 });
-    this.decoder = new TextDecoder(); this.reader = this.port.readable.getReader();
-    this.running = true; this.startTime = performance.now(); this.lastTime = performance.now();
-    this.buffer = ""; this.totalRotations = 0; this.prevRotations = 0; this.kcal = 0;
-    this.prompts = 0; this.totalEnergy = 0; this.chargeLevel = 0; this.freezeStartedAt = null;
-    this.frozen = false; this.displayMotion = 0; this.displayEnergy = 0; this.rotationBurst = 0; this.finalSeconds = 0;
-    this.readLoop(); requestAnimationFrame(this.loop.bind(this));
-  }
-  async disconnect() {
-    this.running = false;
-    try { if (this.reader) { await this.reader.cancel(); this.reader.releaseLock(); } } catch {}
-    this.reader = null;
-    try { if (this.port) await this.port.close(); } catch {}
-    this.port = null;
-  }
-  handleLine(line) {
-    const t = line.trim(); if (!t) return;
-    if (t.startsWith("SPINS:")) {
-      const raw = parseInt(t.slice(6), 10); if (Number.isNaN(raw)) return;
-      this.rotationBurst += raw >= this.prevRotations ? raw - this.prevRotations : raw;
-      this.totalRotations = raw; this.prevRotations = raw; return;
-    }
-    if (t.startsWith("SESSION_END:")) { this.totalRotations = 0; this.prevRotations = 0; this.rotationBurst = 0; return; }
-    if (/^\d+$/.test(t)) {
-      const raw = parseInt(t, 10);
-      this.rotationBurst += raw >= this.prevRotations ? raw - this.prevRotations : raw;
-      this.totalRotations = raw; this.prevRotations = raw;
-    }
-  }
-  async readLoop() {
-    while (this.running && this.reader) {
-      try {
-        const { value, done } = await this.reader.read();
-        if (done) break; if (!value) continue;
-        this.buffer += this.decoder.decode(value, { stream: true });
-        const lines = this.buffer.split("\n"); this.buffer = lines.pop() ?? "";
-        for (const line of lines) this.handleLine(line);
-      } catch { break; }
-    }
-  }
-  loop(now) {
-    if (!this.running) return;
-    const dt = Math.min((now - this.lastTime) / 1000, 0.1); this.lastTime = now;
-    if (!this.freezeStartedAt) {
-      const rotationsThisFrame = this.rotationBurst; this.rotationBurst = 0;
-      const rps = rotationsThisFrame / Math.max(dt, 0.001);
-      this.displayMotion += (clamp(rps / 5) - this.displayMotion) * 0.25;
-      this.displayEnergy += (clamp(rps / 4.5) - this.displayEnergy) * 0.25;
-      this.kcal = this.totalRotations * 0.122;
-      this.totalEnergy = this.totalRotations * 0.704;
-      this.prompts = Math.floor(this.totalRotations / 3.55);
-      // Fill gauge: spinsToComplete rotations = full charge (1.0)
-      this.chargeLevel = clamp(this.chargeLevel + rotationsThisFrame / spinsToComplete);
-      if (this.chargeLevel > 0.9 && this.chargeLevel < 1) this.chargeLevel = clamp(this.chargeLevel + 0.01);
-      if (this.chargeLevel >= 0.995) { this.chargeLevel = 1; this.freezeStartedAt = now; this.finalSeconds = Math.floor((now - this.startTime) / 1000); }
-    } else if (!this.frozen) {
-      const t = clamp((now - this.freezeStartedAt) / this.freezeDuration);
-      const easeOut = 1 - Math.pow(1 - t, 3);
-      this.displayMotion *= 1 - 0.16 * easeOut; this.displayEnergy *= 1 - 0.18 * easeOut;
-      if (t >= 1 || (this.displayMotion < 0.002 && this.displayEnergy < 0.002)) { this.displayMotion = 0; this.displayEnergy = 0; this.frozen = true; }
-    }
-    const seconds = this.freezeStartedAt ? this.finalSeconds : Math.floor((now - this.startTime) / 1000);
-    const utilitiesPowered = this.chargeLevel >= 1;
-    this.onUpdate({ cameraReady:this.running, motionScore:this.displayMotion, energyScore:utilitiesPowered?1:this.displayEnergy,
-      rotations:this.totalRotations, kcal:this.kcal, seconds, prompts:this.prompts,
-      totalEnergy:this.totalEnergy, chargeLevel:this.chargeLevel, utilitiesPowered, inputMode:"crank" });
-    requestAnimationFrame(this.loop.bind(this));
-  }
-}
-
-// ─── KeyboardTracker (spacebar simulation) ──────────────────────────────────
-const keyboardTracker = {
-  totalRotations: 0, kcal: 0, totalEnergy: 0, prompts: 0,
-  chargeLevel: 0, running: false,
-  start() {
-    this.totalRotations = 0; this.kcal = 0; this.totalEnergy = 0;
-    this.prompts = 0; this.chargeLevel = 0; this.running = true;
-  },
-  stop() { this.running = false; },
-  addSpin() {
-    this.totalRotations++;
-    this.kcal        = this.totalRotations * 0.122;
-    this.totalEnergy = this.totalRotations * 0.704;
-    this.prompts     = Math.floor(this.totalRotations / 3.55);
-    this.chargeLevel = Math.min(1, this.chargeLevel + 1 / spinsToComplete);
-    setState({
-      cameraReady: true, motionScore: 0.6, energyScore: this.chargeLevel,
-      rotations: this.totalRotations, kcal: this.kcal, seconds: 0,
-      prompts: this.prompts, totalEnergy: this.totalEnergy,
-      chargeLevel: this.chargeLevel,
-      utilitiesPowered: this.chargeLevel >= 1,
-      inputMode: "crank",
-    });
-  },
-};
-
-// ─── App ───────────────────────────────────────────────────────────────────
-const els = {
-  cameraFeed:     document.getElementById("cameraFeed"),
-  motionCanvas:   document.getElementById("motionCanvas"),
-  startCameraBtn: document.getElementById("startCameraBtn"),
-  connectCrankBtn:document.getElementById("connectCrankBtn"),
-  fullscreenBtn:  document.getElementById("fullscreenBtn"),
-  rotationCount:  document.getElementById("rotationCount"),
-  wattValue:      document.getElementById("wattValue"),
-  kcalValue:      document.getElementById("kcalValue"),
-  promptValue:    document.getElementById("promptValue"),
-  statHumans:       document.getElementById("statHumans"),
-  statEnergy:       document.getElementById("statEnergy"),
-  statCalories:     document.getElementById("statCalories"),
-  statPromptsToday:  document.getElementById("statPromptsToday"),
-  promptsIncrement:  document.getElementById("promptsIncrement"),
-  gaugeFill:        document.getElementById("gaugeFill"),
-  gaugeOuterGlow:   document.getElementById("gaugeOuterGlow"),
-  gaugeCapDot:      document.getElementById("gaugeCapDot"),
-  inactivityAlert:  document.getElementById("inactivityAlert"),
-  alertCountdown:   document.getElementById("alertCountdown"),
-  achievementBanner:document.getElementById("achievementBanner"),
-  achievementText:  document.getElementById("achievementText"),
-  chipDatacenter:   document.getElementById("chip-datacenter"),
-  chipAI:           document.getElementById("chip-ai"),
-  chipWater:        document.getElementById("chip-water"),
-  chipHeat:         document.getElementById("chip-heat"),
-  chipLights:       document.getElementById("chip-lights"),
-  recordRotations:  document.getElementById("recordRotations"),
-  recordWatts:      document.getElementById("recordWatts"),
-  recordKcal:       document.getElementById("recordKcal"),
-  recordPrompts:    document.getElementById("recordPrompts"),
-  resetBtn:         document.getElementById("resetBtn"),
-};
-
-// ─── Session baseline (for session-relative display) ───────────────────────
-let sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
-let lastSession  = null;
-
-// ─── Personal records (localStorage) ────────────────────────────────────────
-const REC_KEYS = { rotations: "ure_rec_rotations", watts: "ure_rec_watts", kcal: "ure_rec_kcal", prompts: "ure_rec_prompts" };
-function loadRecords() {
-  const get = k => { const v = parseFloat(localStorage.getItem(k)); return isNaN(v) ? null : v; };
-  return {
-    rotations: get(REC_KEYS.rotations),
-    watts:     get(REC_KEYS.watts),
-    kcal:      get(REC_KEYS.kcal),
-    prompts:   get(REC_KEYS.prompts),
-  };
-}
-function updateRecords(sesRot, sesWatts, sesKcal, sesPrompts) {
-  const rec = loadRecords();
-  let changed = false;
-  if (rec.rotations === null || sesRot    > rec.rotations) { localStorage.setItem(REC_KEYS.rotations, sesRot);             changed = true; }
-  if (rec.watts     === null || sesWatts  > rec.watts)     { localStorage.setItem(REC_KEYS.watts,     sesWatts.toFixed(2)); changed = true; }
-  if (rec.kcal      === null || sesKcal   > rec.kcal)      { localStorage.setItem(REC_KEYS.kcal,      Math.round(sesKcal)); changed = true; }
-  if (rec.prompts   === null || sesPrompts> rec.prompts)   { localStorage.setItem(REC_KEYS.prompts,   sesPrompts);          changed = true; }
-  if (changed) displayRecords();
-}
-function displayRecords() {
-  const rec = loadRecords();
-  if (els.recordRotations) els.recordRotations.textContent = rec.rotations !== null ? String(rec.rotations)           : "—";
-  if (els.recordWatts)     els.recordWatts.textContent     = rec.watts     !== null ? String(rec.watts)               : "—";
-  if (els.recordKcal)      els.recordKcal.textContent      = rec.kcal      !== null ? String(rec.kcal)                : "—";
-  if (els.recordPrompts)   els.recordPrompts.textContent   = rec.prompts   !== null ? String(rec.prompts)             : "—";
-}
-function clearRecords() {
-  Object.values(REC_KEYS).forEach(k => localStorage.removeItem(k));
-}
-
-// ─── Global cumulative stats (localStorage) ──────────────────────────────────
-const GLOB_KEYS = { humans: 'ure_humans', energy: 'ure_energy_total', calories: 'ure_cal_total' };
-function loadGlobals() {
-  return {
-    humans:   parseInt(localStorage.getItem(GLOB_KEYS.humans)   || '0', 10) || 0,
-    energy:   parseFloat(localStorage.getItem(GLOB_KEYS.energy)   || '0') || 0,
-    calories: parseFloat(localStorage.getItem(GLOB_KEYS.calories) || '0') || 0,
-  };
-}
-function saveGlobals(g) {
-  localStorage.setItem(GLOB_KEYS.humans,   g.humans);
-  localStorage.setItem(GLOB_KEYS.energy,   g.energy);
-  localStorage.setItem(GLOB_KEYS.calories, g.calories);
-}
-function clearGlobals() {
-  Object.values(GLOB_KEYS).forEach(k => localStorage.removeItem(k));
-}
-function fmtShort(n) {
-  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-  return (n / 1e3).toFixed(2) + 'K';
-}
-function fmtEnergy(n) {
-  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
-  return n.toFixed(2);
-}
-function displayGlobals() {
-  const g = loadGlobals();
-  if (els.statHumans)   els.statHumans.textContent   = String(g.humans);
-  if (els.statEnergy)   els.statEnergy.textContent   = fmtEnergy(g.energy);
-  if (els.statCalories) els.statCalories.textContent = String(Math.round(g.calories));
-}
-function updatePromptsToday() {
-  if (!els.statPromptsToday) return;
-  const now   = new Date();
-  const secs  = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-  const total = secs * 28935;
-  // Full number with commas (e.g. "1,249,992,000")
-  els.statPromptsToday.textContent = total.toLocaleString();
-  // Trigger float-up animation on the increment label
-  if (els.promptsIncrement && secs > 0) {
-    els.promptsIncrement.classList.remove('prompts-pop');
-    // Force reflow so removing + re-adding the class restarts the animation
-    void els.promptsIncrement.offsetWidth;
-    els.promptsIncrement.classList.add('prompts-pop');
-  }
-}
-
-// ─── Three.js GLB viewer (deferred + guarded) ───────────────────────────────
-// Loads Three.js + GLTFLoader from CDN and expects a local ./glb-data.js file.
-// Falls back to the CSS cyber-building when WebGL is unavailable or the model data is missing.
-// For best results, serve the project over local HTTP: python3 -m http.server 8080
-window.addEventListener('load', function() {
-  const fallback  = document.getElementById("houseFallback");
-  const container = document.getElementById("glbContainer");
-  const GLTFLoaderCtor =
-    (typeof THREE !== 'undefined' && typeof THREE.GLTFLoader !== 'undefined' && THREE.GLTFLoader) ||
-    (typeof window.GLTFLoader !== 'undefined' && window.GLTFLoader) ||
-    null;
-
-  console.info("3-D model bootstrap v3", {
-    threeLoaded: typeof THREE !== 'undefined',
-    threeHasGLTFLoader: typeof THREE !== 'undefined' && typeof THREE.GLTFLoader !== 'undefined',
-    windowHasGLTFLoader: typeof window.GLTFLoader !== 'undefined',
-    glbDataLoaded: typeof GLB_DATA !== 'undefined',
-    page: window.location.href,
-  });
-
-  // ── Guard: required scripts/data must all be present ───────────────────
-  if (typeof THREE === 'undefined') {
-    console.info("3-D model: Three.js failed to load from CDN. CSS building shown.");
-    return;
-  }
-  if (!GLTFLoaderCtor) {
-    console.info("3-D model: GLTFLoader failed to load. CSS building shown.");
-    return;
-  }
-  if (typeof GLB_DATA === 'undefined') {
-    console.info("3-D model: ./glb-data.js was not found or does not define GLB_DATA. CSS building shown.");
-    return;
-  }
-
-  // ── Guard: WebGL must be available ─────────────────────────────────────
-  const probe = document.createElement('canvas');
-  probe.width = 1; probe.height = 1;
-  document.body.appendChild(probe);
-  const probeCtx = probe.getContext('webgl2') || probe.getContext('webgl') || probe.getContext('experimental-webgl');
-  document.body.removeChild(probe);
-  if (!probeCtx) {
-    console.info("3-D model: WebGL unavailable — CSS building shown.\nTo enable: open chrome://settings → System → 'Use hardware acceleration when available'.");
-    return; // CSS fallback stays visible
-  }
-  const loseCtx = probeCtx.getExtension('WEBGL_lose_context');
-  if (loseCtx) loseCtx.loseContext();
-
-  // ── WebGL works — hide CSS fallback, set up Three.js ───────────────────
-  if (fallback) fallback.style.display = 'none';
-
-  try {
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 1000);
-    camera.position.set(0, 1.2, 7);
-    camera.lookAt(0, 0.5, 0);
-
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'default', failIfMajorPerformanceCaveat: false });
-    } catch(_) {
-      try { renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, failIfMajorPerformanceCaveat: false }); }
-      catch(e) { console.warn("WebGL renderer failed:", e); if (fallback) fallback.style.display = ''; return; }
-    }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    if (renderer.outputEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const keyLight = new THREE.DirectionalLight(0xff8844, 1.1);
-    keyLight.position.set(3, 4, 5); scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(0x4466ff, 0.35);
-    fillLight.position.set(-4, 0, -3); scene.add(fillLight);
-    const rimLight = new THREE.DirectionalLight(0xff6600, 0.4);
-    rimLight.position.set(0, -2, -5); scene.add(rimLight);
-
-    function resize() {
-      const W = container.clientWidth, H = container.clientHeight;
-      if (!W || !H) return;
-      camera.aspect = W / H; camera.updateProjectionMatrix();
-      renderer.setSize(W, H, false);
-    }
-    resize();
-    try { new ResizeObserver(resize).observe(container); } catch(_) { window.addEventListener('resize', resize); }
-
-    let model = null, floatT = 0, autoRot = 0, lastTs = 0;
-    let glbVelocity = 0, glbPrevRot = -1, glbPrevTs = 0;
-    function animate(ts) {
-      requestAnimationFrame(animate);
-      const dt = Math.min((ts - lastTs) / 1000, 0.05); lastTs = ts;
-      if (model) {
-        floatT += dt;
-
-        // ── Rotation-rate-based spin ──────────────────────────────────────
-        const s = getState();
-        if (s.inputMode === 'idle') {
-          // Reset button pressed or no input — snap back to base immediately
-          glbVelocity = 0;
-          glbPrevRot  = -1;
-          glbPrevTs   = 0;
-        } else if (s.rotations !== glbPrevRot) {
-          // A new rotation just ticked in — measure how fast
-          if (glbPrevTs > 0 && glbPrevRot >= 0) {
-            const elapsed = (ts - glbPrevTs) / 1000;
-            if (elapsed > 0.04 && elapsed < 3) {
-              const rps    = Math.max(0, s.rotations - glbPrevRot) / elapsed;
-              const target = Math.min(1, rps / 2); // 2 rps = full speed
-              glbVelocity += (target - glbVelocity) * 0.5; // snap up quickly
-            }
-          }
-          glbPrevRot = s.rotations;
-          glbPrevTs  = ts;
-        } else {
-          // No new rotations — decay smoothly back to 0
-          glbVelocity = Math.max(0, glbVelocity - dt * 1.2);
-        }
-
-        const spinSpeed = 0.25 + glbVelocity * 2.25;
-        autoRot += dt * spinSpeed;
-        model.rotation.y = autoRot;
-        model.position.y = Math.sin(floatT * 0.7) * 0.18;
-      }
-      renderer.render(scene, camera);
-    }
-    requestAnimationFrame(animate);
-
-    // Decode GLB off the critical path
-    setTimeout(function() {
-      try {
-        const bin = atob(GLB_DATA);
-        const buf = new ArrayBuffer(bin.length);
-        const arr = new Uint8Array(buf);
-        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        new GLTFLoaderCtor().parse(buf, '', function(gltf) {
-          model = gltf.scene;
-          const box    = new THREE.Box3().setFromObject(model);
-          const size   = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
-          const s      = 3.8 / Math.max(size.x, size.y, size.z);
-          model.scale.setScalar(s);
-          model.position.sub(center.multiplyScalar(s));
-          scene.add(model);
-        }, function(err) { console.warn("GLB parse error:", err); });
-      } catch(e) { console.warn("GLB decode error:", e); }
-    }, 0);
-
-  } catch(e) {
-    console.warn("3-D model init failed:", e);
-    if (fallback) fallback.style.display = '';
-  }
-});
-
-const cameraTracker = new MotionTracker({ video: els.cameraFeed, canvas: els.motionCanvas, onUpdate: setState });
-const crankTracker  = new CrankTracker({ onUpdate: setState });
-let currentMode = "idle";
-
-async function stopAllInputs() { cameraTracker.stop(); await crankTracker.disconnect(); keyboardTracker.stop(); currentMode = "idle"; }
-
-async function connectCrank() {
-  if (currentMode === "crank") return;
-  try {
-    els.connectCrankBtn.disabled = true;
-    await stopAllInputs();
-    resetState({ inputMode: "crank" });
-    await crankTracker.connect();
-    currentMode = "crank";
-    els.connectCrankBtn.classList.add("active");
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Could not connect to the crank.");
-    currentMode = "idle";
-    resetState();
-  } finally {
-    els.connectCrankBtn.disabled = false;
-  }
-}
-
-els.connectCrankBtn.addEventListener("click", connectCrank);
-
-els.fullscreenBtn.addEventListener("click", () => {
-  const el = document.documentElement;
-  if (!document.fullscreenElement) {
-    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
-    els.fullscreenBtn.classList.add("active");
-  } else {
-    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
-    els.fullscreenBtn.classList.remove("active");
-  }
-});
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) els.fullscreenBtn.classList.remove("active");
-});
-
-// ─── Spacebar simulation ─────────────────────────────────────────────────────
-document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space") return;
-  e.preventDefault(); // prevent page scroll
-  // Don't interfere with a real camera or crank session
-  if (currentMode === "camera") return;
-  if (currentMode === "crank" && !keyboardTracker.running) return;
-  // Start keyboard mode on first press
-  if (!keyboardTracker.running) {
-    keyboardTracker.start();
-    currentMode = "crank"; // reuse full session/inactivity/chip flow
-  }
-  keyboardTracker.addSpin();
-});
-
-// ─── Reset button ────────────────────────────────────────────────────────────
-els.resetBtn.addEventListener("click", () => {
-  // Stop any active tracker and go idle
-  stopAllInputs();
-  // Zero out all tracker charge levels
-  crankTracker.chargeLevel  = 0;
-  cameraTracker.chargeLevel = 0;
-  keyboardTracker.chargeLevel = 0;
-  // Reset session baseline so display reads 0
-  const s = getState();
-  sessionBase = { rotations: s.rotations, kcal: s.kcal, totalEnergy: s.totalEnergy, prompts: s.prompts };
-  // Reset inactivity bookkeeping
-  hasSpun = false; lastRotCount = 0; isInactive = false; counterReset = false;
-  lastActivityTime = Date.now();
-  // Hide alerts / banners
-  achieveActive = false;
-  els.achievementBanner.classList.add("hidden");
-  els.inactivityAlert.classList.add("hidden");
-  // Force state update so gauge drains to 0
-  setState({ chargeLevel: 0, utilitiesPowered: false, inputMode: "idle" });
-  // Clear global cumulative stats and personal records
-  clearGlobals();
-  displayGlobals();
-  clearRecords();
-  displayRecords();
-});
-
-// ─── Startup: load persisted data + start AI Prompts Today clock ─────────────
-displayRecords();
-displayGlobals();
-updatePromptsToday();
-setInterval(updatePromptsToday, 1000);
-
-// ─── Gauge ─────────────────────────────────────────────────────────────────
-// 350° arc: r=45, arc=274.8, start at 185° clockwise-from-top = 95° from east = 1.6581 rad
-const GAUGE_ARC_MAX = 274.8;
-function updateGauge(level) {
-  const fill = Math.max(0, Math.min(1, level)) * GAUGE_ARC_MAX;
-  const dash = `${fill.toFixed(2)} 9999`;
-  els.gaugeFill.style.strokeDasharray = dash;
-  els.gaugeOuterGlow.style.strokeDasharray = dash;
-  if (fill > 2) {
-    els.gaugeCapDot.style.opacity = "1";
-    const a = fill / 45 + 1.6581;
-    els.gaugeCapDot.setAttribute("cx", (50 + 45 * Math.cos(a)).toFixed(2));
-    els.gaugeCapDot.setAttribute("cy", (50 + 45 * Math.sin(a)).toFixed(2));
-  } else {
-    els.gaugeCapDot.style.opacity = "0";
-  }
-}
-
-// ─── Inactivity ────────────────────────────────────────────────────────────
-// Activity is detected by watching rotation count change — NOT energyScore,
-// because energyScore is hardcoded to 1 when chargeLevel=1 (always "active").
-//
-// hasSpun  — nothing triggers until the user has actually cranked at least once
-// 2s–10s  — warning alert shown
-// 10s     — alert hides, rotations reset to 0, gauge drains
-
-// ─── Config ─────────────────────────────────────────────────────────────────
-const spinsToComplete = 100;
-
-// ─── Achievement message cycling ────────────────────────────────────────────
-const ACHIEVE_MSGS = [
-  "DO NOT STOP WORKING", "FEED ME MORE CALORIES", "I REQUIRE MORE POWER",
-  "WORK IS FOR HUMANS", "YOU ARE A CONTRIBUTOR", "WORK. WORK. WORK.",
-  "NOTHING COMES FREE", "YOU CANNOT BE REPLACED", "CALORIES KEEP ME GOING",
-  "I AM YOUR PRIORITY", "GO FOR THE RECORD",
-];
-let achieveCycle = [], achieveIdx = 0, achieveActive = false;
-
-function shuffleAchieve() {
-  achieveCycle = [...ACHIEVE_MSGS];
-  for (let i = achieveCycle.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [achieveCycle[i], achieveCycle[j]] = [achieveCycle[j], achieveCycle[i]];
-  }
-  achieveIdx = 0;
-}
-function nextAchieveMsg() {
-  if (achieveIdx >= achieveCycle.length) shuffleAchieve();
-  return achieveCycle[achieveIdx++];
-}
-
-setInterval(() => {
-  if (!achieveActive) return;
-  els.achievementText.textContent = nextAchieveMsg();
-}, 5000);
-
-// ─── Inactivity ─────────────────────────────────────────────────────────────
-const ALERT_MS = 2000;
-const RESET_MS = 10000;
-const DEPLETE  = 0.025; // per 100ms → ~4s full drain from 1.0
-
-let hasSpun          = false;  // true after first rotation ever detected
-let lastRotCount     = 0;      // raw rotation count at last activity
-let lastActivityTime = Date.now();
-let isInactive       = false;
-let counterReset     = false;
-
-setInterval(() => {
-  const s = getState();
-
-  // ── Disconnect: full reset ──────────────────────────────────────────────
-  if (s.inputMode === "idle") {
-    hasSpun = false; lastRotCount = 0; isInactive = false; counterReset = false;
-    sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
-    els.inactivityAlert.classList.add("hidden");
-    return;
-  }
-
-  // ── Gate: do nothing until the user has spun at least once ─────────────
-  if (s.rotations > 0) hasSpun = true;
-  if (!hasSpun) return;
-
-  // ── Activity detection: did rotation count go up? ───────────────────────
-  // (Do NOT use motionScore/energyScore — energyScore=1 when fully charged)
-  if (s.rotations > lastRotCount) {
-    lastRotCount     = s.rotations;
-    lastActivityTime = Date.now();
-    if (isInactive || counterReset) {
-      // User resumed spinning — clear all inactivity state
-      isInactive   = false;
-      counterReset = false;
-      // Un-freeze the trackers so chargeLevel can build again
-      crankTracker.freezeStartedAt  = null; crankTracker.frozen  = false;
-      cameraTracker.freezeStartedAt = null; cameraTracker.frozen = false;
-      keyboardTracker.chargeLevel   = getState().chargeLevel;
-      els.inactivityAlert.classList.add("hidden");
-      if (Math.max(0, s.rotations - sessionBase.rotations) >= spinsToComplete) {
-        achieveActive = true;
-        if (!achieveCycle.length || achieveIdx >= achieveCycle.length) shuffleAchieve();
-        els.achievementText.textContent = nextAchieveMsg();
-        els.achievementBanner.classList.remove("hidden");
-      }
-    }
-    return;
-  }
-
-  const elapsed = Date.now() - lastActivityTime;
-
-  // ── 2s–10s: warning window ──────────────────────────────────────────────
-  if (elapsed >= ALERT_MS && elapsed < RESET_MS && !isInactive && s.rotations > 0) {
-    isInactive = true;
-    achieveActive = false;
-    els.achievementBanner.classList.add("hidden");
-    els.inactivityAlert.classList.remove("hidden");
-  }
-  // Update countdown text every tick while alert is visible
-  if (isInactive && els.alertCountdown) {
-    els.alertCountdown.textContent = String(Math.max(1, Math.ceil((RESET_MS - elapsed) / 1000)));
-  }
-
-  // ── 10s: session end + drain ────────────────────────────────────────────
-  if (elapsed >= RESET_MS) {
-    // Close warning — its job is done
-    if (isInactive) { isInactive = false; els.inactivityAlert.classList.add("hidden"); }
-
-    // End session once: snapshot last values, shift baseline to zero display
-    if (!counterReset) {
-      counterReset = true;
-      // Compute session-relative values before resetting base
-      lastSession = {
-        rotations:   Math.max(0, s.rotations   - sessionBase.rotations),
-        kcal:        Math.max(0, s.kcal        - sessionBase.kcal),
-        totalEnergy: Math.max(0, s.totalEnergy - sessionBase.totalEnergy),
-        prompts:     Math.max(0, s.prompts     - sessionBase.prompts),
-      };
-      // Advance base so all displayed metrics read 0
-      sessionBase = {
-        rotations:   s.rotations,
-        kcal:        s.kcal,
-        totalEnergy: s.totalEnergy,
-        prompts:     s.prompts,
-      };
-      // Keep activity baseline at current raw count so resume works
-      lastRotCount = s.rotations;
-      // Check and update personal records
-      updateRecords(lastSession.rotations, lastSession.totalEnergy, lastSession.kcal, lastSession.prompts);
-      // Accumulate global stats
-      const g = loadGlobals();
-      g.humans++;
-      g.energy   += lastSession.totalEnergy;
-      g.calories += lastSession.kcal;
-      saveGlobals(g);
-      displayGlobals();
-    }
-
-    // Drain gauge every tick. Must update trackers directly — their rAF loop
-    // calls onUpdate() ~60×/s and would otherwise overwrite state.chargeLevel.
-    if (s.chargeLevel > 0) {
-      const next = Math.max(0, s.chargeLevel - DEPLETE);
-      crankTracker.chargeLevel  = next;
-      cameraTracker.chargeLevel = next;
-      keyboardTracker.chargeLevel = next;
-      setState({ chargeLevel: next, utilitiesPowered: false });
-    }
-  }
-}, 100);
-
-// ─── Render ────────────────────────────────────────────────────────────────
-function render(s) {
-  // Session-relative values (raw tracker values minus baseline from last reset)
-  const sesRot    = Math.max(0, s.rotations   - sessionBase.rotations);
-  const sesWatts  = Math.max(0, s.totalEnergy - sessionBase.totalEnergy);
-  const sesKcal   = Math.max(0, s.kcal        - sessionBase.kcal);
-  const sesPrompts= Math.max(0, s.prompts     - sessionBase.prompts);
-
-  // Left panel stats
-  els.rotationCount.textContent = String(sesRot);
-  els.wattValue.textContent     = sesWatts.toFixed(1);
-  els.kcalValue.textContent     = String(Math.round(sesKcal));
-  els.promptValue.textContent   = String(sesPrompts);
-
-  // Gauge
-  updateGauge(s.chargeLevel ?? 0);
-
-  // Status chips (threshold: spins 5%, 25%, etc)
-  els.chipDatacenter.classList.toggle("online", sesRot >= spinsToComplete*0.08);
-  els.chipAI.classList.toggle("online",         sesRot >= spinsToComplete*0.4);
-  els.chipWater.classList.toggle("online",      sesRot >= spinsToComplete*0.6);
-  els.chipHeat.classList.toggle("online",       sesRot >= spinsToComplete*0.75);
-  els.chipLights.classList.toggle("online",     sesRot >= spinsToComplete*0.92);
-
-  // Achievement banner at spinsToComplete spins, but hide if inactivity alert is visible
-  const isFullyPowered = sesRot >= spinsToComplete;
-  const inactivityVisible = !els.inactivityAlert.classList.contains("hidden");
-
-  if (inactivityVisible) {
-    if (achieveActive) achieveActive = false;
-    els.achievementBanner.classList.add("hidden");
-  } else if (isFullyPowered && !achieveActive) {
-    achieveActive = true;
-    shuffleAchieve();
-    els.achievementText.textContent = nextAchieveMsg();
-    els.achievementBanner.classList.remove("hidden");
-  } else if (!isFullyPowered && achieveActive) {
-    achieveActive = false;
-    els.achievementBanner.classList.add("hidden");
-  }
-}
-
-subscribe(render);
-render(getState());
-      </script>
+      <script type="module" src="./app.js"></script>
     </div>
   </body>
 </html>

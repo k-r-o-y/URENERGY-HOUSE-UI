@@ -1,0 +1,53 @@
+<svg width="281" height="283" viewBox="0 0 281 283" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="149" y="109" width="130" height="2" fill="#D9D9D9"/>
+<rect x="149" y="130" width="130" height="2" fill="#D9D9D9"/>
+<path d="M149 111H150.453V130H149V111Z" fill="#D9D9D9"/>
+<rect x="245.592" y="111" width="1.45251" height="19" fill="#D9D9D9"/>
+<rect x="181.682" y="111" width="1.45251" height="19" fill="#D9D9D9"/>
+<rect x="213.637" y="111" width="1.45251" height="19" fill="#D9D9D9"/>
+<rect x="277.547" y="111" width="1.45251" height="19" fill="#D9D9D9"/>
+<rect x="148" y="188" width="133" height="4" fill="#D9D9D9"/>
+<rect x="148" y="193" width="3" height="90" fill="#D9D9D9"/>
+<rect x="278" y="193" width="3" height="90" fill="#D9D9D9"/>
+<path d="M274.5 195.5V205.5H154.5V195.5H274.5Z" stroke="#D9D9D9"/>
+<path d="M274.5 208.5V218.5H154.5V208.5H274.5Z" stroke="#D9D9D9"/>
+<rect x="154" y="223" width="32" height="44" fill="#D9D9D9"/>
+<rect x="191" y="223" width="32" height="44" fill="#D9D9D9"/>
+<path d="M185 185H202V186C202 186.552 201.552 187 201 187H186C185.448 187 185 186.552 185 186V185Z" fill="#D9D9D9"/>
+<path d="M205 185H222V186C222 186.552 221.552 187 221 187H206C205.448 187 205 186.552 205 186V185Z" fill="#D9D9D9"/>
+<path d="M249 170H255C256.105 170 257 170.895 257 172H250C249.448 172 249 171.552 249 171V170Z" fill="#D9D9D9"/>
+<path d="M255 172H257V188H255V172Z" fill="#D9D9D9"/>
+<path d="M252 184.5C252 183.672 252.672 183 253.5 183H255V186H253.5C252.672 186 252 185.328 252 184.5Z" fill="#D9D9D9"/>
+<path d="M257 183H258.5C259.328 183 260 183.672 260 184.5C260 185.328 259.328 186 258.5 186H257V183Z" fill="#D9D9D9"/>
+<path d="M158 174H165C165.552 174 166 174.448 166 175V175.167H159C158.448 175.167 158 174.719 158 174.167V174Z" fill="#D9D9D9"/>
+<rect x="160" y="175.167" width="6" height="11.6667" fill="#D9D9D9"/>
+<path d="M159 187.833C159 187.281 159.448 186.833 160 186.833H166C166.552 186.833 167 187.281 167 187.833V188H159V187.833Z" fill="#D9D9D9"/>
+<path d="M166 176.333H167C167.552 176.333 168 176.781 168 177.333V177.5H166V176.333Z" fill="#D9D9D9"/>
+<path d="M167 177.5H168V183.333C167.448 183.333 167 182.886 167 182.333V177.5Z" fill="#D9D9D9"/>
+<path d="M182 135H221C221 137.209 219.209 139 217 139H186C183.791 139 182 137.209 182 135Z" fill="#D9D9D9"/>
+<rect x="192" y="132" width="20" height="3" fill="#D9D9D9"/>
+<rect x="249" y="113" width="26" height="15" rx="1" fill="#645F5F"/>
+<rect x="251" y="119" width="1" height="4" fill="#D9D9D9"/>
+<path d="M230 230.098H268C268.552 230.098 269 230.545 269 231.098V265C269 265.552 268.552 266 268 266H230C229.448 266 229 265.552 229 265V231.098C229 230.545 229.448 230.098 230 230.098Z" stroke="#D9D9D9" stroke-width="2"/>
+<rect x="228" y="223" width="42" height="3" rx="1" fill="#D9D9D9"/>
+<rect x="233" y="234" width="32" height="28" rx="1" fill="#645F5F"/>
+<rect x="52" width="2" height="83" fill="#D9D9D9"/>
+<rect x="49.4816" y="82.4681" width="7.49388" height="5.42553" fill="#D9D9D9"/>
+<rect x="38.9902" y="87.8614" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+<rect x="43.4865" y="98.9703" width="19.4841" height="3.0297" fill="#D9D9D9"/>
+<rect x="38.9902" y="95.9406" width="29.9755" height="3.0297" fill="#D9D9D9"/>
+<rect x="27" y="90.8911" width="52.4572" height="5.0495" fill="#D9D9D9"/>
+<rect x="23" y="189" width="59" height="2" fill="#D9D9D9"/>
+<rect x="30" y="191" width="2" height="77" fill="#D9D9D9"/>
+<rect x="73" y="191" width="2" height="77" fill="#D9D9D9"/>
+<path d="M0 214C0 213.448 0.447715 213 1 213H18C18.5523 213 19 213.448 19 214V216H0V214Z" fill="#D9D9D9"/>
+<rect x="3" y="216" width="1" height="52" fill="#D9D9D9"/>
+<rect x="15" y="216" width="1" height="52" fill="#D9D9D9"/>
+<path d="M2 207H3C3.55228 207 4 207.448 4 208V213H2V207Z" fill="#D9D9D9"/>
+<rect x="4" y="263" width="11" height="1" fill="#D9D9D9"/>
+<path d="M105 214C105 213.448 104.552 213 104 213H87C86.4477 213 86 213.448 86 214V216H105V214Z" fill="#D9D9D9"/>
+<rect width="1" height="52" transform="matrix(-1 0 0 1 102 216)" fill="#D9D9D9"/>
+<rect width="1" height="52" transform="matrix(-1 0 0 1 90 216)" fill="#D9D9D9"/>
+<path d="M103 207H102C101.448 207 101 207.448 101 208V213H103V207Z" fill="#D9D9D9"/>
+<rect width="11" height="1" transform="matrix(-1 0 0 1 101 263)" fill="#D9D9D9"/>
+</svg>
