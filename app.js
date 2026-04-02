@@ -20,7 +20,7 @@ const els = {
 
   statHumans: document.getElementById("statHumans"),
   statEnergy: document.getElementById("statEnergy"),
-  statCalories: document.getElementById("statCalories"),
+  statFastestFill: document.getElementById("statFastestFill"),
   statPromptsToday: document.getElementById("statPromptsToday"),
   promptsIncrement: document.getElementById("promptsIncrement"),
 
@@ -224,21 +224,23 @@ function clearRecords() {
 const GLOB_KEYS = {
   humans: "ure_humans",
   energy: "ure_energy_total",
-  calories: "ure_cal_total",
+  fastestFill: "ure_fastest_fill",
 };
 
 function loadGlobals() {
   return {
     humans: parseInt(localStorage.getItem(GLOB_KEYS.humans) || "0", 10) || 0,
     energy: parseFloat(localStorage.getItem(GLOB_KEYS.energy) || "0") || 0,
-    calories: parseFloat(localStorage.getItem(GLOB_KEYS.calories) || "0") || 0,
+    fastestFill: parseFloat(localStorage.getItem(GLOB_KEYS.fastestFill)) || null,
   };
 }
 
 function saveGlobals(g) {
   localStorage.setItem(GLOB_KEYS.humans, String(g.humans));
   localStorage.setItem(GLOB_KEYS.energy, String(g.energy));
-  localStorage.setItem(GLOB_KEYS.calories, String(g.calories));
+  if (g.fastestFill !== null) {
+    localStorage.setItem(GLOB_KEYS.fastestFill, String(g.fastestFill));
+  }
 }
 
 function clearGlobals() {
@@ -252,11 +254,20 @@ function fmtEnergy(n) {
   return n.toFixed(2);
 }
 
+function fmtFillTime(seconds) {
+  if (seconds === null) return "—";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  const ms = Math.round((seconds % 1) * 10);
+  if (m > 0) return `${m}:${String(s).padStart(2, "0")}.${ms}`;
+  return `${s}.${ms}s`;
+}
+
 function displayGlobals() {
   const g = loadGlobals();
   if (els.statHumans) els.statHumans.textContent = String(g.humans);
   if (els.statEnergy) els.statEnergy.textContent = fmtEnergy(g.energy);
-  if (els.statCalories) els.statCalories.textContent = String(Math.round(g.calories));
+  if (els.statFastestFill) els.statFastestFill.textContent = fmtFillTime(g.fastestFill);
 }
 
 function updatePromptsToday() {
@@ -578,6 +589,10 @@ let isInactive = false;
 let counterReset = false;
 let isDraining = false;
 
+/* ---- Fill Timer ---- */
+let fillStartTime = null;
+let fillRecordThisSession = false;
+
 setInterval(() => {
   const s = getState();
 
@@ -643,6 +658,7 @@ setInterval(() => {
 
     if (!counterReset) {
       counterReset = true;
+      fillStartTime = null;
 
       lastSession = {
         rotations: Math.max(0, s.rotations - sessionBase.rotations),
@@ -670,7 +686,6 @@ setInterval(() => {
       const g = loadGlobals();
       g.humans += 1;
       g.energy += lastSession.totalEnergy;
-      g.calories += lastSession.kcal;
       saveGlobals(g);
       displayGlobals();
     }
@@ -703,6 +718,17 @@ function render(s) {
   if (els.kcalValue) els.kcalValue.textContent = String(Math.round(sesKcal));
   if (els.promptValue) els.promptValue.textContent = String(sesPrompts);
 
+  /* ---- Fill Timer ---- */
+  // Start timer on first spin of a session
+  if (sesRot === 1 && fillStartTime === null) {
+    fillStartTime = performance.now();
+    // New attempt started — clear glow from previous record
+    if (fillRecordThisSession) {
+      fillRecordThisSession = false;
+      els.statFastestFill?.classList.remove("record-glow");
+    }
+  }
+
   updateGauge(s.chargeLevel ?? 0);
   updateHouseVisuals(s.chargeLevel ?? 0);
 
@@ -712,6 +738,21 @@ function render(s) {
   els.chipHeat?.classList.toggle("online", level >= 0.32);
   els.chipWater?.classList.toggle("online", level >= 0.58);
   els.chipAI?.classList.toggle("online", level >= 0.93);
+
+  // Record fill time when goal is reached
+  if (level >= 1 && fillStartTime !== null) {
+    const fillSeconds = (performance.now() - fillStartTime) / 1000;
+    fillStartTime = null;
+
+    const g = loadGlobals();
+    if (g.fastestFill === null || fillSeconds < g.fastestFill) {
+      g.fastestFill = fillSeconds;
+      saveGlobals(g);
+      displayGlobals();
+      fillRecordThisSession = true;
+      els.statFastestFill?.classList.add("record-glow");
+    }
+  }
 
   const isFullyPowered = level >= 1;
   const inactivityVisible = !els.inactivityAlert?.classList.contains("hidden");
@@ -752,6 +793,10 @@ els.resetBtn?.addEventListener("click", async () => {
   isInactive = false;
   counterReset = false;
   lastActivityTime = Date.now();
+
+  fillStartTime = null;
+  fillRecordThisSession = false;
+  els.statFastestFill?.classList.remove("record-glow");
 
   achieveActive = false;
   hasShownFirstAchieveMsg = false;
