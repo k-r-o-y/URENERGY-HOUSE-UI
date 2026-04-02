@@ -215,14 +215,19 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: clamp(1.6rem, 2.8vw, 3rem);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: #ff6a00;
-  text-shadow:
-    0 0 10px rgba(255, 106, 0, 0.5),
-    0 0 24px rgba(255, 106, 0, 0.25);
-  animation: spin-start-pulse 2.2s ease-in-out infinite;
+  padding: 22px 40px;
+  background: rgba(0, 180, 80, 0.18);
+  border: 1px solid rgba(0, 220, 100, 0.65);
+  border-radius: 12px;
+  font-size: clamp(1.4rem, 2vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: #00e664;
+  box-shadow:
+    0 0 40px rgba(0, 200, 90, 0.45),
+    0 0 120px rgba(0, 200, 90, 0.25),
+    inset 0 0 18px rgba(0, 200, 90, 0.2);
+  animation: spinStartPulse 2s ease-in-out infinite;
   pointer-events: none;
   white-space: nowrap;
 }
@@ -231,9 +236,15 @@ body {
   display: none;
 }
 
-@keyframes spin-start-pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+@keyframes spinStartPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
 }
 
 .prompts-stat-item {
