@@ -1099,3 +1099,51 @@ body {
   transform: scale(1.05);
 }
 
+.wave-visualizer-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: -10px; /* moved lower so it doesn't clip the logo */
+  transform: translateX(-50%);
+  width: min(58%, 620px);
+  height: 120px;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.wave-visualizer {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.wave-path,
+.wave-glow-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 0.14s linear;
+}
+
+.wave-path {
+  stroke: url(#waveStrokeGradient);
+  stroke-width: 3.2;
+  opacity: 0.18;
+}
+
+.wave-glow-path {
+  stroke: url(#waveGlowGradient);
+  stroke-width: 10;
+  opacity: 0.06;
+  filter: url(#waveGlowFilter);
+}
+
+.wave-visualizer-wrap.is-active .wave-path {
+  opacity: 0.95;
+}
+
+.wave-visualizer-wrap.is-active .wave-glow-path {
+  opacity: 0.5;
+}
