@@ -130,7 +130,7 @@ body {
   -webkit-backdrop-filter: blur(28px) saturate(160%);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  padding: clamp(20px, 2.5vw, 40px) clamp(16px, 2vw, 32px);
+  padding: clamp(14px, 2vw, 28px) clamp(14px, 1.8vw, 28px);
   box-shadow:
     0 8px 40px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
@@ -138,18 +138,18 @@ body {
 }
 
 .session-header {
-  font-size: clamp(1rem, 1.4vw, 1.6rem);
+  font-size: clamp(0.9rem, 1.2vw, 1.4rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--primary);
-  margin-bottom: clamp(18px, 2.2vh, 32px);
+  margin-bottom: clamp(12px, 1.8vh, 22px);
   font-weight: 700;
 }
 
 .session-stats {
   display: flex;
   flex-direction: column;
-  gap: clamp(28px, 4.5vh, 56px);
+  gap: clamp(14px, 2.8vh, 36px);
 }
 
 .stat-item {
@@ -185,7 +185,7 @@ body {
 }
 
 .stat-value {
-  font-size: clamp(2.4rem, 3.5vw, 4rem);
+  font-size: clamp(1.8rem, 2.8vw, 3.2rem);
   line-height: 1;
   font-weight: 800;
   color: var(--text);
@@ -307,18 +307,18 @@ body {
 }
 
 .stat-label {
-  font-size: clamp(0.9rem, 1.3vw, 1.5rem);
+  font-size: clamp(0.78rem, 1.1vw, 1.25rem);
   color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
-  margin-top: 5px;
+  margin-top: 3px;
 }
 
 .stat-last {
-  font-size: clamp(0.75rem, 0.8vw, 0.95rem);
+  font-size: clamp(0.65rem, 0.7vw, 0.85rem);
   color: rgba(255, 255, 255, 0.65);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .center-panel {

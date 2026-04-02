@@ -15,12 +15,14 @@ const els = {
 
   rotationCount: document.getElementById("rotationCount"),
   wattValue: document.getElementById("wattValue"),
+  fillTimeValue: document.getElementById("fillTimeValue"),
   kcalValue: document.getElementById("kcalValue"),
   promptValue: document.getElementById("promptValue"),
 
   statHumans: document.getElementById("statHumans"),
   statEnergy: document.getElementById("statEnergy"),
   statFastestFill: document.getElementById("statFastestFill"),
+  statCalories: document.getElementById("statCalories"),
   statPromptsToday: document.getElementById("statPromptsToday"),
   promptsIncrement: document.getElementById("promptsIncrement"),
 
@@ -226,6 +228,7 @@ const GLOB_KEYS = {
   humans: "ure_humans",
   energy: "ure_energy_total",
   fastestFill: "ure_fastest_fill",
+  calories: "ure_cal_total",
 };
 
 function loadGlobals() {
@@ -233,6 +236,7 @@ function loadGlobals() {
     humans: parseInt(localStorage.getItem(GLOB_KEYS.humans) || "0", 10) || 0,
     energy: parseFloat(localStorage.getItem(GLOB_KEYS.energy) || "0") || 0,
     fastestFill: parseFloat(localStorage.getItem(GLOB_KEYS.fastestFill)) || null,
+    calories: parseFloat(localStorage.getItem(GLOB_KEYS.calories) || "0") || 0,
   };
 }
 
@@ -242,6 +246,7 @@ function saveGlobals(g) {
   if (g.fastestFill !== null) {
     localStorage.setItem(GLOB_KEYS.fastestFill, String(g.fastestFill));
   }
+  localStorage.setItem(GLOB_KEYS.calories, String(g.calories));
 }
 
 function clearGlobals() {
@@ -269,6 +274,7 @@ function displayGlobals() {
   if (els.statHumans) els.statHumans.textContent = String(g.humans);
   if (els.statEnergy) els.statEnergy.textContent = fmtEnergy(g.energy);
   if (els.statFastestFill) els.statFastestFill.textContent = fmtFillTime(g.fastestFill);
+  if (els.statCalories) els.statCalories.textContent = String(Math.round(g.calories));
 }
 
 function updatePromptsToday() {
@@ -592,10 +598,11 @@ let isDraining = false;
 
 /* ---- Fill Timer ---- */
 let fillStartTime = null;
+let fillEndTime = null;           // set when chargeLevel hits 1 or session ends
 let fillRecordThisSession = false;
 
 /* ---- Frozen Stats (persist display after drain) ---- */
-let frozenStats = null;          // { rotations, watts, kcal, prompts } or null
+let frozenStats = null;          // { rotations, watts, kcal, prompts, fillTime } or null
 let statRecordsThisSession = {}; // { rotations: true, watts: true, ... }
 
 setInterval(() => {
@@ -663,7 +670,18 @@ setInterval(() => {
 
     if (!counterReset) {
       counterReset = true;
+
+      // Compute fill time for frozen display BEFORE nulling fillStartTime
+      let sessionFillTime = null;
+      if (fillEndTime !== null && fillStartTime !== null) {
+        // Completed the goal — use the exact completion time
+        sessionFillTime = (fillEndTime - fillStartTime) / 1000;
+      } else if (fillStartTime !== null) {
+        // Didn't complete — use elapsed time until now
+        sessionFillTime = (performance.now() - fillStartTime) / 1000;
+      }
       fillStartTime = null;
+      fillEndTime = null;
 
       lastSession = {
         rotations: Math.max(0, s.rotations - sessionBase.rotations),
@@ -678,6 +696,7 @@ setInterval(() => {
         watts: lastSession.totalEnergy,
         kcal: lastSession.kcal,
         prompts: lastSession.prompts,
+        fillTime: sessionFillTime,
       };
 
       // Check which stats beat their records and mark them
@@ -715,6 +734,7 @@ setInterval(() => {
       const g = loadGlobals();
       g.humans += 1;
       g.energy += lastSession.totalEnergy;
+      g.calories += lastSession.kcal;
       saveGlobals(g);
       displayGlobals();
     }
@@ -748,6 +768,7 @@ function render(s) {
   if (frozenStats) {
     if (els.rotationCount) els.rotationCount.textContent = String(frozenStats.rotations);
     if (els.wattValue) els.wattValue.textContent = frozenStats.watts.toFixed(1);
+    if (els.fillTimeValue) els.fillTimeValue.textContent = fmtFillTime(frozenStats.fillTime);
     if (els.kcalValue) els.kcalValue.textContent = String(Math.round(frozenStats.kcal));
     if (els.promptValue) els.promptValue.textContent = String(frozenStats.prompts);
 
@@ -761,12 +782,21 @@ function render(s) {
     if (els.wattValue) els.wattValue.textContent = sesWatts.toFixed(1);
     if (els.kcalValue) els.kcalValue.textContent = String(Math.round(sesKcal));
     if (els.promptValue) els.promptValue.textContent = String(sesPrompts);
+
+    // Live stopwatch — tick while spinning, freeze once goal hit
+    if (fillStartTime !== null && fillEndTime === null) {
+      const elapsed = (performance.now() - fillStartTime) / 1000;
+      if (els.fillTimeValue) els.fillTimeValue.textContent = fmtFillTime(elapsed);
+    } else if (fillStartTime === null) {
+      if (els.fillTimeValue) els.fillTimeValue.textContent = "0.0s";
+    }
   }
 
   /* ---- Fill Timer ---- */
   // Start timer on first spin of a session
   if (sesRot === 1 && fillStartTime === null) {
     fillStartTime = performance.now();
+    fillEndTime = null;
 
     // New session started — clear frozen stats, record glows, spin-to-start
     if (frozenStats) {
@@ -797,9 +827,12 @@ function render(s) {
   els.chipAI?.classList.toggle("online", level >= 0.93);
 
   // Record fill time when goal is reached
-  if (level >= 1 && fillStartTime !== null) {
-    const fillSeconds = (performance.now() - fillStartTime) / 1000;
-    fillStartTime = null;
+  if (level >= 1 && fillStartTime !== null && fillEndTime === null) {
+    fillEndTime = performance.now();
+    const fillSeconds = (fillEndTime - fillStartTime) / 1000;
+
+    // Update the live display with the final time
+    if (els.fillTimeValue) els.fillTimeValue.textContent = fmtFillTime(fillSeconds);
 
     const g = loadGlobals();
     if (g.fastestFill === null || fillSeconds < g.fastestFill) {
@@ -852,6 +885,7 @@ els.resetBtn?.addEventListener("click", async () => {
   lastActivityTime = Date.now();
 
   fillStartTime = null;
+  fillEndTime = null;
   fillRecordThisSession = false;
   els.statFastestFill?.classList.remove("record-glow");
 
@@ -887,6 +921,16 @@ els.resetBtn?.addEventListener("click", async () => {
   clearRecords();
   displayRecords();
 });
+
+/* -------------------- STOPWATCH TICK -------------------- */
+
+(function tickStopwatch() {
+  if (!frozenStats && fillStartTime !== null && fillEndTime === null && els.fillTimeValue) {
+    const elapsed = (performance.now() - fillStartTime) / 1000;
+    els.fillTimeValue.textContent = fmtFillTime(elapsed);
+  }
+  requestAnimationFrame(tickStopwatch);
+})();
 
 /* -------------------- INIT -------------------- */
 
