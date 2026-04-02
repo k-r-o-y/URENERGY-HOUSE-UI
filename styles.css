@@ -545,7 +545,8 @@ body {
 }
 
 .achievement-banner,
-.inactivity-alert {
+.inactivity-alert
+ {
   position: fixed;
   top: 50%;
   left: 50%;
