@@ -8,10 +8,10 @@
   </head>
   <body>
     <div class="app-shell">
-
       <div class="top-left-logo">
         <img src="./new_logo.svg" alt="Logo" />
       </div>
+
       <div class="corner-icons">
         <button id="startCameraBtn" class="icon-btn" aria-label="Start Camera" style="display: none"></button>
 
@@ -186,49 +186,15 @@
                   <rect x="651.858" y="340.2" width="2.99353" height="5.44444" fill="#D9D9D9"/>
                   <rect id="light-bedroom" class="house-light" x="640.881" y="348" width="24.946" height="1.5" rx="0.75" fill="#2b3b48"/>
 
-<!-- mirror -->
-<rect x="901.819" y="374.5" width="28.9353" height="41" rx="0.5" stroke="#D9D9D9"/>
+                  <rect x="901.819" y="374.5" width="28.9353" height="41" rx="0.5" stroke="#D9D9D9"/>
+                  <rect id="mirror-panel" class="mirror-panel" x="903.1" y="375.8" width="26.3" height="38.4" rx="0.4" fill="#1a2730" />
+                  <circle id="mirror-dot" class="mirror-dot" cx="916" cy="412" r="1.65" fill="#1a2730"/>
 
-<!-- faint mirror panel fill -->
-<rect
-  id="mirror-panel"
-  class="mirror-panel"
-  x="903.1"
-  y="375.8"
-  width="26.3"
-  height="38.4"
-  rx="0.4"
-  fill="#1a2730"
-/>
+                  <path id="mirror-signal-left-1" class="mirror-signal" d="M913.9 410.9C912.7 410.0 911.8 409.0 911.1 407.7"/>
+                  <path id="mirror-signal-left-2" class="mirror-signal" d="M914.7 412.5C912.9 411.4 911.5 410.0 910.4 408.0"/>
+                  <path id="mirror-signal-right-1" class="mirror-signal" d="M918.1 410.9C919.3 410.0 920.2 409.0 920.9 407.7"/>
+                  <path id="mirror-signal-right-2" class="mirror-signal" d="M917.3 412.5C919.1 411.4 920.5 410.0 921.6 408.0"/>
 
-<circle id="mirror-dot" class="mirror-dot" cx="916" cy="412" r="1.65" fill="#1a2730"/>
-
-<!-- mirror signal: like phone wifi, slightly bigger, sideways -->
-<path
-  id="mirror-signal-left-1"
-  class="mirror-signal"
-  d="M913.9 410.9C912.7 410.0 911.8 409.0 911.1 407.7"
-/>
-
-<path
-  id="mirror-signal-left-2"
-  class="mirror-signal"
-  d="M914.7 412.5C912.9 411.4 911.5 410.0 910.4 408.0"
-/>
-
-<path
-  id="mirror-signal-right-1"
-  class="mirror-signal"
-  d="M918.1 410.9C919.3 410.0 920.2 409.0 920.9 407.7"
-/>
-
-<path
-  id="mirror-signal-right-2"
-  class="mirror-signal"
-  d="M917.3 412.5C919.1 411.4 920.5 410.0 921.6 408.0"
-/>
-
-                  <!-- phone -->
                   <rect x="727.694" y="450" width="35.9224" height="3" fill="#D9D9D9"/>
                   <rect x="729.689" y="454" width="31.931" height="11" fill="#D9D9D9"/>
                   <rect x="729.689" y="466" width="31.931" height="11" fill="#D9D9D9"/>
@@ -243,11 +209,8 @@
                   <path id="phone-wifi-2" class="wifi-signal" d="M736.2 437.2C737.3 436.1 738.8 435.5 740.45 435.5C742.1 435.5 743.6 436.1 744.7 437.2" />
                   <path id="phone-wifi-3" class="wifi-signal" d="M737.7 435.5C738.4 434.8 739.3 434.45 740.45 434.45C741.6 434.45 742.5 434.8 743.2 435.5" />
 
-                  
-
                   <rect id="light-kitchen-hood" class="house-light" x="776" y="636" width="38" height="4" rx="2" fill="#2b3b48"/>
 
-                  <!-- washer -->
                   <rect x="958" y="697" width="4" height="75" fill="#D9D9D9"/>
                   <rect x="1013" y="697" width="4" height="75" fill="#D9D9D9"/>
                   <path d="M987.5 726C996.669 726 1004 732.994 1004 741.5C1004 750.006 996.669 757 987.5 757C978.331 757 971 750.006 971 741.5C971 732.994 978.331 726 987.5 726Z" stroke="#D9D9D9" stroke-width="2"/>
@@ -263,7 +226,6 @@
                   <circle cx="995.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
                   <circle cx="1005.5" cy="705.5" r="2.5" fill="#D9D9D9"/>
 
-                  <!-- kitchen -->
                   <rect x="742" y="610" width="130" height="2" fill="#D9D9D9"/>
                   <rect x="742" y="631" width="130" height="2" fill="#D9D9D9"/>
                   <path d="M742 612H743.453V631H742V612Z" fill="#D9D9D9"/>
@@ -292,16 +254,13 @@
                   <path d="M775 636H814C814 638.209 812.209 640 810 640H779C776.791 640 775 638.209 775 636Z" fill="#D9D9D9"/>
                   <rect x="785" y="633" width="20" height="3" fill="#D9D9D9"/>
 
-                  <!-- microwave -->
                   <rect x="842" y="614" width="26" height="15" rx="1" fill="#645F5F"/>
                   <rect id="microwave-screen" class="device-screen warm-device" x="844" y="616" width="20" height="11" rx="1" fill="#2b3b48"/>
 
-                  <!-- oven -->
                   <path d="M823 731.098H861C861.552 731.098 862 731.545 862 732.098V766C862 766.552 861.552 767 861 767H823C822.448 767 822 766.552 822 766V732.098C822 731.545 822.448 731.098 823 731.098Z" stroke="#D9D9D9" stroke-width="2"/>
                   <rect x="821" y="724" width="42" height="3" rx="1" fill="#D9D9D9"/>
                   <rect id="oven-window" class="device-screen warm-device" x="826" y="735" width="32" height="28" rx="1" fill="#2b3b48"/>
 
-                  <!-- dining light -->
                   <rect x="645" y="501" width="2" height="83" fill="#D9D9D9"/>
                   <rect x="642.482" y="583.468" width="7.49388" height="5.42553" fill="#D9D9D9"/>
                   <rect x="631.99" y="588.861" width="29.9755" height="3.0297" fill="#D9D9D9"/>
@@ -310,7 +269,6 @@
                   <rect x="620" y="591.891" width="52.4572" height="5.0495" fill="#D9D9D9"/>
                   <rect id="light-dining" class="house-light" x="631.99" y="599.97" width="29.9755" height="3.0297" rx="1.5" fill="#2b3b48"/>
 
-                  <!-- living room / tv -->
                   <rect x="616" y="690" width="59" height="2" fill="#D9D9D9"/>
                   <rect x="623" y="692" width="2" height="77" fill="#D9D9D9"/>
                   <rect x="666" y="692" width="2" height="77" fill="#D9D9D9"/>
@@ -348,7 +306,6 @@
                   <rect x="373" y="744" width="1" height="17" fill="#D9D9D9"/>
                   <rect x="395" y="744" width="20" height="17" fill="#D9D9D9"/>
 
-                  <!-- pendant lights -->
                   <rect x="430" y="540" width="10" height="33" fill="#D9D9D9"/>
                   <rect x="445" y="557" width="10" height="33" fill="#D9D9D9"/>
                   <rect x="417" y="568" width="10" height="38" fill="#D9D9D9"/>
@@ -373,12 +330,56 @@
                 </g>
               </svg>
             </div>
-<!--
-            <div class="status-chip chip-br" id="chip-lights">
-              <span class="chip-dot"></span>
-              <span class="chip-label">AI Energy Tax</span>
+
+            <div class="wave-visualizer-wrap" id="waveVisualizerWrap" aria-hidden="true">
+              <svg
+                class="wave-visualizer"
+                id="waveVisualizer"
+                viewBox="0 0 640 120"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="waveStrokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="rgba(255,106,0,0)"></stop>
+                    <stop offset="12%" stop-color="#ff8c3c"></stop>
+                    <stop offset="50%" stop-color="#ffd2a6"></stop>
+                    <stop offset="88%" stop-color="#ff8c3c"></stop>
+                    <stop offset="100%" stop-color="rgba(255,106,0,0)"></stop>
+                  </linearGradient>
+            
+                  <linearGradient id="waveGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="rgba(255,106,0,0)"></stop>
+                    <stop offset="18%" stop-color="rgba(255,140,60,0.45)"></stop>
+                    <stop offset="50%" stop-color="rgba(255,210,166,0.95)"></stop>
+                    <stop offset="82%" stop-color="rgba(255,140,60,0.45)"></stop>
+                    <stop offset="100%" stop-color="rgba(255,106,0,0)"></stop>
+                  </linearGradient>
+            
+                  <filter id="waveGlowFilter" x="-25%" y="-120%" width="150%" height="340%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur1"></feGaussianBlur>
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur2"></feGaussianBlur>
+                    <feMerge>
+                      <feMergeNode in="blur2"></feMergeNode>
+                      <feMergeNode in="blur1"></feMergeNode>
+                      <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                  </filter>
+                </defs>
+            
+                <path
+                  id="waveGlowPath"
+                  class="wave-glow-path"
+                  d="M 0 76 C 26 76 26 56 53 56 C 80 56 80 96 107 96 C 134 96 134 56 160 56 C 187 56 187 96 214 96 C 241 96 241 56 267 56 C 294 56 294 96 321 96 C 348 96 348 56 374 56 C 401 56 401 96 428 96 C 455 96 455 56 481 56 C 508 56 508 96 535 96 C 562 96 562 56 588 56 C 615 56 615 76 640 76"
+                ></path>
+            
+                <path
+                  id="wavePath"
+                  class="wave-path"
+                  d="M 0 76 C 26 76 26 56 53 56 C 80 56 80 96 107 96 C 134 96 134 56 160 56 C 187 56 187 96 214 96 C 241 96 241 56 267 56 C 294 56 294 96 321 96 C 348 96 348 56 374 56 C 401 56 401 96 428 96 C 455 96 455 56 481 56 C 508 56 508 96 535 96 C 562 96 562 56 588 56 C 615 56 615 76 640 76"
+                ></path>
+              </svg>
             </div>
-          -->
+
             <div class="status-chip chip-tl" id="chip-heat">
               <span class="chip-dot"></span>
               <span class="chip-label">AI Energy Tax</span>
