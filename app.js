@@ -687,6 +687,10 @@ setInterval(() => {
     } else {
       isDraining = false;
       crankTracker.paused = false;
+      // Reset crank baseline so next session starts chargeLevel from 0
+      crankTracker.baseRotations = crankTracker.totalRotations;
+      crankTracker.freezeStartedAt = null;
+      crankTracker.frozen = false;
     }
   }
 }, 100);

@@ -19,6 +19,7 @@ export class CrankTracker {
 
     this.totalRotations = 0;
     this.prevRotations = 0;
+    this.baseRotations = 0;
 
     this.kcal = 0;
     this.prompts = 0;
@@ -55,6 +56,7 @@ export class CrankTracker {
     this.buffer = "";
     this.totalRotations = 0;
     this.prevRotations = 0;
+    this.baseRotations = 0;
     this.kcal = 0;
     this.prompts = 0;
     this.totalEnergy = 0;
@@ -156,6 +158,15 @@ export class CrankTracker {
   loop(now) {
     if (!this.running) return;
 
+    // When paused (drain animation), let app.js control chargeLevel;
+    // skip all calculations and state updates so we don't fight the drain.
+    if (this.paused) {
+      this.lastTime = now;
+      this.rotationBurst = 0;
+      requestAnimationFrame(this.loop.bind(this));
+      return;
+    }
+
     const dt = Math.min((now - this.lastTime) / 1000, 0.1);
     this.lastTime = now;
 
@@ -176,7 +187,8 @@ export class CrankTracker {
       this.prompts = Math.floor(this.totalEnergy / 12.5);
 
       // Use spin-count-based chargeLevel, matching keyboard logic
-      this.chargeLevel = clamp(this.totalRotations / this.spinsToComplete);
+      const sessionRotations = this.totalRotations - this.baseRotations;
+      this.chargeLevel = clamp(sessionRotations / this.spinsToComplete);
 
       if (this.chargeLevel >= 1) {
         this.chargeLevel = 1;
