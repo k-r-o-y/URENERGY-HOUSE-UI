@@ -2,7 +2,7 @@ import { getState, resetState, subscribe, setState } from "./state.js";
 import { MotionTracker } from "./motion.js";
 import { CrankTracker } from "./crank.js";
 
-const spinsToComplete = 100;
+const spinsToComplete = 50;
 
 const els = {
   cameraFeed: document.getElementById("cameraFeed"),
