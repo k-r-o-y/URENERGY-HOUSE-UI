@@ -28,6 +28,7 @@ const els = {
   gaugeOuterGlow: document.getElementById("gaugeOuterGlow"),
   gaugeCapDot: document.getElementById("gaugeCapDot"),
 
+  spinToStart: document.getElementById("spinToStart"),
   inactivityAlert: document.getElementById("inactivityAlert"),
   alertCountdown: document.getElementById("alertCountdown"),
   achievementBanner: document.getElementById("achievementBanner"),
@@ -593,6 +594,10 @@ let isDraining = false;
 let fillStartTime = null;
 let fillRecordThisSession = false;
 
+/* ---- Frozen Stats (persist display after drain) ---- */
+let frozenStats = null;          // { rotations, watts, kcal, prompts } or null
+let statRecordsThisSession = {}; // { rotations: true, watts: true, ... }
+
 setInterval(() => {
   const s = getState();
 
@@ -667,6 +672,30 @@ setInterval(() => {
         prompts: Math.max(0, s.prompts - sessionBase.prompts),
       };
 
+      // Freeze current display values so they persist after drain
+      frozenStats = {
+        rotations: lastSession.rotations,
+        watts: lastSession.totalEnergy,
+        kcal: lastSession.kcal,
+        prompts: lastSession.prompts,
+      };
+
+      // Check which stats beat their records and mark them
+      const prevRec = loadRecords();
+      statRecordsThisSession = {};
+      if (prevRec.rotations === null || lastSession.rotations > prevRec.rotations) {
+        statRecordsThisSession.rotations = true;
+      }
+      if (prevRec.watts === null || lastSession.totalEnergy > prevRec.watts) {
+        statRecordsThisSession.watts = true;
+      }
+      if (prevRec.kcal === null || lastSession.kcal > prevRec.kcal) {
+        statRecordsThisSession.kcal = true;
+      }
+      if (prevRec.prompts === null || lastSession.prompts > prevRec.prompts) {
+        statRecordsThisSession.prompts = true;
+      }
+
       sessionBase = {
         rotations: s.rotations,
         kcal: s.kcal,
@@ -701,6 +730,7 @@ setInterval(() => {
     } else {
       isDraining = false;
       crankTracker.paused = false;
+      els.spinToStart?.classList.remove("hidden");
     }
   }
 }, 100);
@@ -713,16 +743,43 @@ function render(s) {
   const sesKcal = Math.max(0, s.kcal - sessionBase.kcal);
   const sesPrompts = Math.max(0, s.prompts - sessionBase.prompts);
 
-  if (els.rotationCount) els.rotationCount.textContent = String(sesRot);
-  if (els.wattValue) els.wattValue.textContent = sesWatts.toFixed(1);
-  if (els.kcalValue) els.kcalValue.textContent = String(Math.round(sesKcal));
-  if (els.promptValue) els.promptValue.textContent = String(sesPrompts);
+  // If stats are frozen (post-drain), display the frozen values;
+  // otherwise display live session values.
+  if (frozenStats) {
+    if (els.rotationCount) els.rotationCount.textContent = String(frozenStats.rotations);
+    if (els.wattValue) els.wattValue.textContent = frozenStats.watts.toFixed(1);
+    if (els.kcalValue) els.kcalValue.textContent = String(Math.round(frozenStats.kcal));
+    if (els.promptValue) els.promptValue.textContent = String(frozenStats.prompts);
+
+    // Apply record glow to stats that beat their previous record
+    els.rotationCount?.classList.toggle("record-glow", !!statRecordsThisSession.rotations);
+    els.wattValue?.classList.toggle("record-glow", !!statRecordsThisSession.watts);
+    els.kcalValue?.classList.toggle("record-glow", !!statRecordsThisSession.kcal);
+    els.promptValue?.classList.toggle("record-glow", !!statRecordsThisSession.prompts);
+  } else {
+    if (els.rotationCount) els.rotationCount.textContent = String(sesRot);
+    if (els.wattValue) els.wattValue.textContent = sesWatts.toFixed(1);
+    if (els.kcalValue) els.kcalValue.textContent = String(Math.round(sesKcal));
+    if (els.promptValue) els.promptValue.textContent = String(sesPrompts);
+  }
 
   /* ---- Fill Timer ---- */
   // Start timer on first spin of a session
   if (sesRot === 1 && fillStartTime === null) {
     fillStartTime = performance.now();
-    // New attempt started — clear glow from previous record
+
+    // New session started — clear frozen stats, record glows, spin-to-start
+    if (frozenStats) {
+      frozenStats = null;
+      statRecordsThisSession = {};
+      els.rotationCount?.classList.remove("record-glow");
+      els.wattValue?.classList.remove("record-glow");
+      els.kcalValue?.classList.remove("record-glow");
+      els.promptValue?.classList.remove("record-glow");
+    }
+    els.spinToStart?.classList.add("hidden");
+
+    // Clear fastest-fill glow from previous record
     if (fillRecordThisSession) {
       fillRecordThisSession = false;
       els.statFastestFill?.classList.remove("record-glow");
@@ -797,6 +854,14 @@ els.resetBtn?.addEventListener("click", async () => {
   fillStartTime = null;
   fillRecordThisSession = false;
   els.statFastestFill?.classList.remove("record-glow");
+
+  frozenStats = null;
+  statRecordsThisSession = {};
+  els.rotationCount?.classList.remove("record-glow");
+  els.wattValue?.classList.remove("record-glow");
+  els.kcalValue?.classList.remove("record-glow");
+  els.promptValue?.classList.remove("record-glow");
+  els.spinToStart?.classList.add("hidden");
 
   achieveActive = false;
   hasShownFirstAchieveMsg = false;
