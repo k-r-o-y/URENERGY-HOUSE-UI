@@ -30,6 +30,10 @@ const els = {
   gaugeOuterGlow: document.getElementById("gaugeOuterGlow"),
   gaugeCapDot: document.getElementById("gaugeCapDot"),
 
+  waveVisualizerWrap: document.getElementById("waveVisualizerWrap"),
+  wavePath: document.getElementById("wavePath"),
+  waveGlowPath: document.getElementById("waveGlowPath"),
+
   spinToStart: document.getElementById("spinToStart"),
   inactivityAlert: document.getElementById("inactivityAlert"),
   alertCountdown: document.getElementById("alertCountdown"),
@@ -310,6 +314,7 @@ async function connectCrank() {
     await stopAllInputs();
     resetState({ inputMode: "crank" });
     forceGaugeImmediate(0);
+    resetWaveImmediate();
     await crankTracker.connect();
     currentMode = "crank";
     els.connectCrankBtn?.classList.add("active");
@@ -345,6 +350,7 @@ async function startTestFill() {
   await stopAllInputs();
   resetState({ inputMode: "crank" });
   forceGaugeImmediate(0);
+  resetWaveImmediate();
 
   keyboardTracker.start();
   currentMode = "crank";
@@ -460,6 +466,119 @@ function updateGauge(level) {
   els.gaugeCapDot.setAttribute("cx", point.x.toFixed(2));
   els.gaugeCapDot.setAttribute("cy", point.y.toFixed(2));
   els.gaugeCapDot.style.opacity = "1";
+}
+
+/* -------------------- WAVE VISUALIZER -------------------- */
+
+let waveAnimFrame = null;
+let wavePhase = 0;
+let waveCurrentIntensity = 0;
+let waveTargetIntensity = 0;
+let waveLastTime = performance.now();
+let waveLastActivityTime = 0;
+let previousWaveRotations = 0;
+
+function buildWavePath(width, height, amplitude, cycles, phase) {
+  const midY = height * 0.62;
+  const step = 8;
+  let d = "";
+
+  for (let x = 0; x <= width; x += step) {
+    const progress = x / width;
+    const taper = Math.sin(progress * Math.PI);
+    const angle = progress * Math.PI * 2 * cycles + phase;
+    const y = midY + Math.sin(angle) * amplitude * taper;
+
+    if (x === 0) {
+      d += `M ${x.toFixed(2)} ${y.toFixed(2)}`;
+    } else {
+      d += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }
+  }
+
+  return d;
+}
+
+function renderWave(intensity) {
+  if (!els.wavePath || !els.waveGlowPath || !els.waveVisualizerWrap) return;
+
+  const width = 620;
+  const height = 120;
+
+  const idleAmplitude = 3.5;
+  const activeAmplitude = 18;
+  const amplitude = idleAmplitude + (activeAmplitude - idleAmplitude) * intensity;
+
+  const idleCycles = 2.5;
+  const activeCycles = 5.5;
+  const cycles = idleCycles + (activeCycles - idleCycles) * intensity;
+
+  const d = buildWavePath(width, height, amplitude, cycles, wavePhase);
+
+  els.wavePath.setAttribute("d", d);
+  els.waveGlowPath.setAttribute("d", d);
+
+  const active = intensity > 0.08;
+  els.waveVisualizerWrap.classList.toggle("is-active", active);
+}
+
+function pulseWave(amount = 0.18) {
+  waveTargetIntensity = clamp(Math.max(waveTargetIntensity, amount));
+  waveLastActivityTime = performance.now();
+}
+
+function resetWaveImmediate() {
+  waveTargetIntensity = 0;
+  waveCurrentIntensity = 0;
+  wavePhase = 0;
+  waveLastActivityTime = 0;
+  previousWaveRotations = 0;
+
+  if (els.waveVisualizerWrap) {
+    els.waveVisualizerWrap.classList.remove("is-active");
+  }
+
+  renderWave(0);
+}
+
+function tickWave(now) {
+  const dt = Math.min((now - waveLastTime) / 1000, 0.05);
+  waveLastTime = now;
+
+  const state = getState();
+  const inactivityVisible = !els.inactivityAlert?.classList.contains("hidden");
+  const recentlyActive = now - waveLastActivityTime < 140;
+  const liveSessionRot = Math.max(0, state.rotations - sessionBase.rotations);
+
+  const keepWaveIdle = liveSessionRot <= 1;
+
+  let desired = 0;
+
+  if (
+    !isDraining &&
+    !inactivityVisible &&
+    state.inputMode !== "idle" &&
+    !keepWaveIdle
+  ) {
+    desired = clamp(
+      Math.max(
+        recentlyActive ? waveTargetIntensity : 0,
+        state.energyScore * 0.32
+      )
+    );
+  }
+
+  const easing = desired > waveCurrentIntensity ? 0.2 : 0.16;
+  waveCurrentIntensity += (desired - waveCurrentIntensity) * easing;
+
+  const phaseSpeed = 1.3 + waveCurrentIntensity * 7.5;
+  wavePhase += dt * phaseSpeed;
+
+  renderWave(clamp(waveCurrentIntensity));
+
+  waveTargetIntensity = Math.max(0, waveTargetIntensity - dt * 1.9);
+
+  waveAnimFrame = requestAnimationFrame(tickWave);
 }
 
 /* -------------------- HOUSE LIGHTS / DEVICES / WASHER -------------------- */
@@ -598,12 +717,12 @@ let isDraining = false;
 
 /* ---- Fill Timer ---- */
 let fillStartTime = null;
-let fillEndTime = null;           // set when chargeLevel hits 1 or session ends
+let fillEndTime = null;
 let fillRecordThisSession = false;
 
-/* ---- Frozen Stats (persist display after drain) ---- */
-let frozenStats = null;          // { rotations, watts, kcal, prompts, fillTime } or null
-let statRecordsThisSession = {}; // { rotations: true, watts: true, ... }
+/* ---- Frozen Stats ---- */
+let frozenStats = null;
+let statRecordsThisSession = {};
 
 setInterval(() => {
   const s = getState();
@@ -615,6 +734,7 @@ setInterval(() => {
     counterReset = false;
     isDraining = false;
     crankTracker.paused = false;
+    waveTargetIntensity = 0;
     sessionBase = { rotations: 0, kcal: 0, totalEnergy: 0, prompts: 0 };
     els.inactivityAlert?.classList.add("hidden");
     return;
@@ -632,6 +752,7 @@ setInterval(() => {
       counterReset = false;
       isDraining = false;
       crankTracker.paused = false;
+      waveTargetIntensity = 0;
 
       cameraTracker.freezeStartedAt = null;
       cameraTracker.frozen = false;
@@ -671,13 +792,10 @@ setInterval(() => {
     if (!counterReset) {
       counterReset = true;
 
-      // Compute fill time for frozen display BEFORE nulling fillStartTime
       let sessionFillTime = null;
       if (fillEndTime !== null && fillStartTime !== null) {
-        // Completed the goal — use the exact completion time
         sessionFillTime = (fillEndTime - fillStartTime) / 1000;
       } else if (fillStartTime !== null) {
-        // Didn't complete — use elapsed time until now
         sessionFillTime = (performance.now() - fillStartTime) / 1000;
       }
       fillStartTime = null;
@@ -690,7 +808,6 @@ setInterval(() => {
         prompts: Math.max(0, s.prompts - sessionBase.prompts),
       };
 
-      // Freeze current display values so they persist after drain
       frozenStats = {
         rotations: lastSession.rotations,
         watts: lastSession.totalEnergy,
@@ -699,7 +816,6 @@ setInterval(() => {
         fillTime: sessionFillTime,
       };
 
-      // Check which stats beat their records and mark them
       const prevRec = loadRecords();
       statRecordsThisSession = {};
       if (prevRec.rotations === null || lastSession.rotations > prevRec.rotations) {
@@ -742,6 +858,8 @@ setInterval(() => {
     if (s.chargeLevel > 0) {
       isDraining = true;
       crankTracker.paused = true;
+      waveTargetIntensity = 0;
+
       const next = Math.max(0, s.chargeLevel - DEPLETE);
       crankTracker.chargeLevel = next;
       cameraTracker.chargeLevel = next;
@@ -750,6 +868,7 @@ setInterval(() => {
     } else {
       isDraining = false;
       crankTracker.paused = false;
+      waveTargetIntensity = 0;
       els.spinToStart?.classList.remove("hidden");
     }
   }
@@ -763,8 +882,18 @@ function render(s) {
   const sesKcal = Math.max(0, s.kcal - sessionBase.kcal);
   const sesPrompts = Math.max(0, s.prompts - sessionBase.prompts);
 
-  // If stats are frozen (post-drain), display the frozen values;
-  // otherwise display live session values.
+  if (s.rotations > previousWaveRotations) {
+    const delta = s.rotations - previousWaveRotations;
+
+    if (sesRot > 1) {
+      pulseWave(clamp(0.14 + delta * 0.09, 0, 1));
+    }
+
+    previousWaveRotations = s.rotations;
+  } else if (s.rotations < previousWaveRotations) {
+    previousWaveRotations = s.rotations;
+  }
+
   if (frozenStats) {
     if (els.rotationCount) els.rotationCount.textContent = String(frozenStats.rotations);
     if (els.wattValue) els.wattValue.textContent = frozenStats.watts.toFixed(1);
@@ -772,7 +901,6 @@ function render(s) {
     if (els.kcalValue) els.kcalValue.textContent = String(Math.round(frozenStats.kcal));
     if (els.promptValue) els.promptValue.textContent = String(frozenStats.prompts);
 
-    // Apply record glow to stats that beat their previous record
     els.rotationCount?.classList.toggle("record-glow", !!statRecordsThisSession.rotations);
     els.wattValue?.classList.toggle("record-glow", !!statRecordsThisSession.watts);
     els.kcalValue?.classList.toggle("record-glow", !!statRecordsThisSession.kcal);
@@ -783,7 +911,6 @@ function render(s) {
     if (els.kcalValue) els.kcalValue.textContent = String(Math.round(sesKcal));
     if (els.promptValue) els.promptValue.textContent = String(sesPrompts);
 
-    // Live stopwatch — tick while spinning, freeze once goal hit
     if (fillStartTime !== null && fillEndTime === null) {
       const elapsed = (performance.now() - fillStartTime) / 1000;
       if (els.fillTimeValue) els.fillTimeValue.textContent = fmtFillTime(elapsed);
@@ -792,13 +919,10 @@ function render(s) {
     }
   }
 
-  /* ---- Fill Timer ---- */
-  // Start timer on first spin of a session
   if (sesRot === 1 && fillStartTime === null) {
     fillStartTime = performance.now();
     fillEndTime = null;
 
-    // New session started — clear frozen stats, record glows, spin-to-start
     if (frozenStats) {
       frozenStats = null;
       statRecordsThisSession = {};
@@ -809,7 +933,6 @@ function render(s) {
     }
     els.spinToStart?.classList.add("hidden");
 
-    // Clear fastest-fill glow from previous record
     if (fillRecordThisSession) {
       fillRecordThisSession = false;
       els.statFastestFill?.classList.remove("record-glow");
@@ -826,12 +949,10 @@ function render(s) {
   els.chipWater?.classList.toggle("online", level >= 0.58);
   els.chipAI?.classList.toggle("online", level >= 0.93);
 
-  // Record fill time when goal is reached
   if (level >= 1 && fillStartTime !== null && fillEndTime === null) {
     fillEndTime = performance.now();
     const fillSeconds = (fillEndTime - fillStartTime) / 1000;
 
-    // Update the live display with the final time
     if (els.fillTimeValue) els.fillTimeValue.textContent = fmtFillTime(fillSeconds);
 
     const g = loadGlobals();
@@ -912,6 +1033,7 @@ els.resetBtn?.addEventListener("click", async () => {
   });
 
   forceGaugeImmediate(0);
+  resetWaveImmediate();
 
   updateWasherVisual(0);
   updateDeviceVisuals(0);
@@ -940,5 +1062,9 @@ updatePromptsToday();
 setInterval(updatePromptsToday, 1000);
 
 forceGaugeImmediate(0);
+resetWaveImmediate();
 subscribe(render);
 render(getState());
+
+waveLastTime = performance.now();
+waveAnimFrame = requestAnimationFrame(tickWave);
