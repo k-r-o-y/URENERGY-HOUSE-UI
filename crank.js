@@ -1,7 +1,3 @@
-function clamp(value, min = 0, max = 1) {
-  return Math.max(min, Math.min(max, value));
-}
-
 export class CrankTracker {
   constructor({ onUpdate, spinsToComplete = 100 }) {
     this.onUpdate = onUpdate;
@@ -12,29 +8,16 @@ export class CrankTracker {
     this.decoder = null;
 
     this.running = false;
-    this.startTime = 0;
-    this.lastTime = 0;
-
     this.buffer = "";
 
-    this.totalRotations = 0;
     this.prevRotations = 0;
-    this.baseRotations = 0;
 
+    this.totalRotations = 0;
     this.kcal = 0;
     this.prompts = 0;
     this.totalEnergy = 0;
     this.chargeLevel = 0;
 
-    this.freezeStartedAt = null;
-    this.freezeDuration = 2200;
-    this.frozen = false;
-
-    this.displayMotion = 0;
-    this.displayEnergy = 0;
-
-    this.rotationBurst = 0;
-    this.finalSeconds = 0;
     this.paused = false;
   }
 
@@ -50,26 +33,15 @@ export class CrankTracker {
     this.reader = this.port.readable.getReader();
 
     this.running = true;
-    this.startTime = performance.now();
-    this.lastTime = performance.now();
-
     this.buffer = "";
-    this.totalRotations = 0;
     this.prevRotations = 0;
-    this.baseRotations = 0;
+    this.totalRotations = 0;
     this.kcal = 0;
     this.prompts = 0;
     this.totalEnergy = 0;
     this.chargeLevel = 0;
-    this.freezeStartedAt = null;
-    this.frozen = false;
-    this.displayMotion = 0;
-    this.displayEnergy = 0;
-    this.rotationBurst = 0;
-    this.finalSeconds = 0;
 
     this.readLoop();
-    requestAnimationFrame(this.loop.bind(this));
   }
 
   async disconnect() {
@@ -93,45 +65,55 @@ export class CrankTracker {
     this.port = null;
   }
 
+  addSpin() {
+    this.totalRotations += 1;
+    this.kcal = this.totalRotations * 0.122;
+    this.totalEnergy = this.totalRotations * 0.704;
+    this.prompts = Math.floor(this.totalRotations / 3.55);
+    this.chargeLevel = Math.min(1, this.chargeLevel + 1 / this.spinsToComplete);
+
+    this.onUpdate({
+      cameraReady: true,
+      motionScore: 0.6,
+      energyScore: this.chargeLevel,
+      rotations: this.totalRotations,
+      kcal: this.kcal,
+      seconds: 0,
+      prompts: this.prompts,
+      totalEnergy: this.totalEnergy,
+      chargeLevel: this.chargeLevel,
+      utilitiesPowered: this.chargeLevel >= 1,
+      inputMode: "crank",
+    });
+  }
+
   handleLine(line) {
     const t = line.trim();
     if (!t) return;
     if (this.paused) return;
 
+    let raw = null;
+
     if (t.startsWith("SPINS:")) {
-      const raw = parseInt(t.slice(6), 10);
-      if (Number.isNaN(raw)) return;
-
-      if (raw >= this.prevRotations) {
-        const delta = raw - this.prevRotations;
-        this.rotationBurst += delta;
-      } else {
-        this.rotationBurst += raw;
-      }
-
-      this.totalRotations = raw;
-      this.prevRotations = raw;
+      raw = parseInt(t.slice(6), 10);
+    } else if (t.startsWith("SESSION_END:")) {
       return;
+    } else if (/^\d+$/.test(t)) {
+      raw = parseInt(t, 10);
     }
 
-    if (t.startsWith("SESSION_END:")) {
-      this.totalRotations = 0;
-      this.prevRotations = 0;
-      this.rotationBurst = 0;
-      return;
+    if (raw === null || Number.isNaN(raw)) return;
+
+    let delta;
+    if (raw >= this.prevRotations) {
+      delta = raw - this.prevRotations;
+    } else {
+      delta = raw;
     }
+    this.prevRotations = raw;
 
-    if (/^\d+$/.test(t)) {
-      const raw = parseInt(t, 10);
-      if (raw >= this.prevRotations) {
-        const delta = raw - this.prevRotations;
-        this.rotationBurst += delta;
-      } else {
-        this.rotationBurst += raw;
-      }
-
-      this.totalRotations = raw;
-      this.prevRotations = raw;
+    for (let i = 0; i < delta; i++) {
+      this.addSpin();
     }
   }
 
@@ -153,83 +135,5 @@ export class CrankTracker {
         break;
       }
     }
-  }
-
-  loop(now) {
-    if (!this.running) return;
-
-    // When paused (drain animation), let app.js control chargeLevel;
-    // skip all calculations and state updates so we don't fight the drain.
-    if (this.paused) {
-      this.lastTime = now;
-      this.rotationBurst = 0;
-      requestAnimationFrame(this.loop.bind(this));
-      return;
-    }
-
-    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
-    this.lastTime = now;
-
-    if (!this.freezeStartedAt) {
-      const rotationsThisFrame = this.rotationBurst;
-      this.rotationBurst = 0;
-
-      const rotationsPerSecond = rotationsThisFrame / Math.max(dt, 0.001);
-
-      const rawMotionScore = clamp(rotationsPerSecond / 5);
-      const rawEnergyScore = clamp(rotationsPerSecond / 4.5);
-
-      this.displayMotion += (rawMotionScore - this.displayMotion) * 0.25;
-      this.displayEnergy += (rawEnergyScore - this.displayEnergy) * 0.25;
-
-      this.kcal = this.totalRotations * 0.122;
-      this.totalEnergy = this.totalRotations * 3.52;
-      this.prompts = Math.floor(this.totalEnergy / 12.5);
-
-      // Use spin-count-based chargeLevel, matching keyboard logic
-      const sessionRotations = this.totalRotations - this.baseRotations;
-      this.chargeLevel = clamp(sessionRotations / this.spinsToComplete);
-
-      if (this.chargeLevel >= 1) {
-        this.chargeLevel = 1;
-        this.freezeStartedAt = now;
-        this.finalSeconds = Math.floor((now - this.startTime) / 1000);
-      }
-    } else if (!this.frozen) {
-      const elapsed = now - this.freezeStartedAt;
-      const t = clamp(elapsed / this.freezeDuration);
-      const easeOut = 1 - Math.pow(1 - t, 3);
-
-      this.displayMotion *= 1 - 0.16 * easeOut;
-      this.displayEnergy *= 1 - 0.18 * easeOut;
-
-      if (t >= 1 || (this.displayMotion < 0.002 && this.displayEnergy < 0.002)) {
-        this.displayMotion = 0;
-        this.displayEnergy = 0;
-        this.frozen = true;
-      }
-    }
-
-    const seconds = this.freezeStartedAt
-      ? this.finalSeconds
-      : Math.floor((now - this.startTime) / 1000);
-
-    const utilitiesPowered = this.chargeLevel >= 1;
-
-    this.onUpdate({
-      cameraReady: this.running,
-      motionScore: this.displayMotion,
-      energyScore: utilitiesPowered ? 1 : this.displayEnergy,
-      rotations: this.totalRotations,
-      kcal: this.kcal,
-      seconds,
-      prompts: this.prompts,
-      totalEnergy: this.totalEnergy,
-      chargeLevel: this.chargeLevel,
-      utilitiesPowered,
-      inputMode: "crank",
-    });
-
-    requestAnimationFrame(this.loop.bind(this));
   }
 }

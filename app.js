@@ -606,10 +606,9 @@ setInterval(() => {
       isDraining = false;
       crankTracker.paused = false;
 
-      crankTracker.freezeStartedAt = null;
-      crankTracker.frozen = false;
       cameraTracker.freezeStartedAt = null;
       cameraTracker.frozen = false;
+      crankTracker.chargeLevel = getState().chargeLevel;
       keyboardTracker.chargeLevel = getState().chargeLevel;
 
       els.inactivityAlert?.classList.add("hidden");
@@ -687,10 +686,6 @@ setInterval(() => {
     } else {
       isDraining = false;
       crankTracker.paused = false;
-      // Reset crank baseline so next session starts chargeLevel from 0
-      crankTracker.baseRotations = crankTracker.totalRotations;
-      crankTracker.freezeStartedAt = null;
-      crankTracker.frozen = false;
     }
   }
 }, 100);
